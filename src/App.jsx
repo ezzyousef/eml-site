@@ -1655,30 +1655,28 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
           {activeTab === "save" && (
             <div style={{ padding: "0 18px 18px" }}>
               <p style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", letterSpacing: "0.12em", marginBottom: 16, textTransform: "uppercase" }}>Save & Deploy to Netlify</p>
+
+              {/* GitHub Token Box */}
               <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(240,180,41,0.2)", padding: "14px 16px", borderRadius: 2, marginBottom: 16 }}>
-                <p style={{ fontSize: 10, color: "#f0b429", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Netlify Settings</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div>
-                    <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>Repository</label>
-                    <input value={ghRepo} onChange={e => setGhRepo(e.target.value)} placeholder="username/repo-name"
-                      style={{ width: "100%", padding: "7px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontFamily: "Space Mono", fontSize: 11, outline: "none", borderRadius: 2, boxSizing: "border-box" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>
-                      Netlify Token (pre-configured)
-                      <a href="https://github.com/settings/tokens/new?scopes=repo&description=EML+Admin" target="_blank" rel="noreferrer"
-                        style={{ color: "#f0b429", marginLeft: 8, textDecoration: "none", fontSize: 9 }}>Generate ↗</a>
-                    </label>
-                    <input type="password" value={ghToken} onChange={e => setGhToken(e.target.value)} placeholder="Already configured ✓"
-                      style={{ width: "100%", padding: "7px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontFamily: "Space Mono", fontSize: 11, outline: "none", borderRadius: 2, boxSizing: "border-box" }} />
-                    <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 4 }}>Netlify token is pre-configured. No setup needed.</p>
-                  </div>
-                  <button onClick={() => { localStorage.setItem("eml_gh_token", ghToken); localStorage.setItem("eml_gh_repo", ghRepo); setSaveMsg("✓ Settings saved"); setTimeout(() => setSaveMsg(""), 3000); }}
-                    style={{ padding: "7px 14px", background: "rgba(240,180,41,0.1)", border: "1px solid rgba(240,180,41,0.4)", color: "#f0b429", fontFamily: "Space Mono", fontSize: 10, cursor: "pointer", borderRadius: 2 }}>
-                    Settings saved ✓
-                  </button>
-                </div>
+                <p style={{ fontSize: 10, color: "#f0b429", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 6, textTransform: "uppercase", fontWeight: 700 }}>GitHub Token Required</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 10, lineHeight: 1.6 }}>
+                  Your edits are saved to GitHub, then Netlify rebuilds automatically.
+                </p>
+                <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>
+                  GitHub Personal Access Token
+                  <a href="https://github.com/settings/tokens/new?scopes=repo&description=EML+Admin" target="_blank" rel="noreferrer"
+                    style={{ color: "#f0b429", marginLeft: 8, textDecoration: "none", fontSize: 9 }}>Generate ↗</a>
+                </label>
+                <input type="password" value={ghToken} onChange={e => setGhToken(e.target.value)}
+                  placeholder="ghp_xxxxxxxxxxxx"
+                  style={{ width: "100%", padding: "7px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontFamily: "Space Mono", fontSize: 11, outline: "none", borderRadius: 2, boxSizing: "border-box", marginBottom: 8 }} />
+                <button onClick={() => { try { localStorage.setItem("eml_gh_token", ghToken); } catch {} setSaveMsg("✓ Token saved!"); setTimeout(() => setSaveMsg(""), 2000); }}
+                  style={{ padding: "7px 14px", background: "rgba(240,180,41,0.1)", border: "1px solid rgba(240,180,41,0.4)", color: "#f0b429", fontFamily: "Space Mono", fontSize: 10, cursor: "pointer", borderRadius: 2 }}>
+                  Save Token
+                </button>
               </div>
+
+              {/* What gets saved */}
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: 2, marginBottom: 16 }}>
                 <p style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 10, textTransform: "uppercase" }}>What Gets Saved</p>
                 {[
@@ -1696,17 +1694,21 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
                   </div>
                 ))}
               </div>
+
+              {/* Save button */}
               <button onClick={saveToGitHub} disabled={saving}
                 style={{ width: "100%", padding: "14px", background: saving ? "#333" : "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", cursor: saving ? "not-allowed" : "pointer", borderRadius: 2, textTransform: "uppercase", marginBottom: 10 }}>
-                {saving ? "⏳ Rebuilding…" : "💾 Save & Publish to Netlify"}
+                {saving ? "⏳ Saving…" : "💾 SAVE & PUBLISH TO NETLIFY"}
               </button>
+
               {saveMsg && (
                 <p style={{ fontSize: 11, fontFamily: "Space Mono", color: saveMsg.startsWith("✓") ? "#1a9e75" : "#e05555", textAlign: "center", padding: "8px", background: saveMsg.startsWith("✓") ? "rgba(26,158,117,0.1)" : "rgba(224,85,85,0.1)", borderRadius: 2 }}>
                   {saveMsg}
                 </p>
               )}
+
               <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 12, lineHeight: 1.6 }}>
-                Triggers a Netlify rebuild. Changes go live in ~30 seconds.
+                Saves to GitHub → Netlify rebuilds → live in ~30 seconds.
               </p>
             </div>
           )}
