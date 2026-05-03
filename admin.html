@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EML Admin Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',sans-serif;background:#060f1e;color:white;min-height:100vh}
+  .login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+  .login-box{background:#0d1d38;border:1px solid #f0b429;padding:48px;width:360px;border-radius:4px;text-align:center}
+  .logo{font-size:28px;font-weight:700;color:#f0b429;margin-bottom:8px;font-family:'Space Mono',monospace}
+  .logo span{color:white}
+  .subtitle{font-size:12px;color:rgba(255,255,255,0.4);font-family:'Space Mono',monospace;margin-bottom:32px;letter-spacing:0.1em}
+  input[type=password],input[type=text],input[type=number],textarea,select{
+    width:100%;padding:10px 14px;background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.15);color:white;font-family:'Outfit',sans-serif;
+    font-size:14px;outline:none;border-radius:3px;transition:border 0.2s;margin-bottom:12px
+  }
+  input:focus,textarea:focus,select:focus{border-color:#f0b429}
+  .btn{width:100%;padding:12px;background:#f0b429;color:#060f1e;border:none;font-family:'Space Mono',monospace;
+    font-size:13px;font-weight:700;letter-spacing:0.08em;cursor:pointer;border-radius:3px;transition:all 0.2s}
+  .btn:hover{background:#ffc947}
+  .btn-outline{background:transparent;border:1px solid #f0b429;color:#f0b429}
+  .btn-outline:hover{background:rgba(240,180,41,0.1)}
+  .btn-danger{background:#e05555;color:white}
+  .btn-sm{width:auto;padding:8px 20px;font-size:11px}
+  .dashboard{display:none;min-height:100vh}
+  .topbar{background:#0a162e;border-bottom:2px solid #f0b429;padding:0 32px;height:60px;
+    display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .topbar-brand{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#f0b429}
+  .topbar-brand span{color:rgba(255,255,255,0.5);font-size:11px;margin-left:12px}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .status{font-size:11px;font-family:'Space Mono',monospace;padding:4px 12px;border-radius:20px}
+  .status.success{background:rgba(26,158,117,0.2);color:#1a9e75}
+  .status.error{background:rgba(224,85,85,0.2);color:#e05555}
+  .status.loading{background:rgba(240,180,41,0.2);color:#f0b429}
+  .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+  .sidebar{background:#0a162e;border-right:1px solid rgba(255,255,255,0.06);padding:24px 0}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:12px 24px;cursor:pointer;
+    font-size:13px;color:rgba(255,255,255,0.5);transition:all 0.15s;border-left:3px solid transparent}
+  .nav-item:hover{background:rgba(255,255,255,0.04);color:white}
+  .nav-item.active{background:rgba(240,180,41,0.08);color:#f0b429;border-left-color:#f0b429}
+  .nav-icon{font-size:16px;width:20px;text-align:center}
+  .nav-label{font-size:12px;font-family:'Space Mono',monospace;letter-spacing:0.05em}
+  .content{padding:40px;background:#0d1d38;min-height:calc(100vh - 60px)}
+  .page{display:none}
+  .page.active{display:block}
+  .page-title{font-size:24px;font-weight:700;color:white;margin-bottom:8px}
+  .page-desc{font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:32px;line-height:1.6}
+  .card{background:#0a162e;border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:28px;margin-bottom:20px}
+  .card-title{font-size:13px;font-family:'Space Mono',monospace;color:#f0b429;letter-spacing:0.1em;
+    text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+  label{display:block;font-size:11px;font-family:'Space Mono',monospace;color:#8a9ab0;
+    letter-spacing:0.08em;margin-bottom:6px;text-transform:uppercase}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .full{grid-column:1/-1}
+  .msg{padding:12px 16px;border-radius:3px;font-size:13px;font-family:'Space Mono',monospace;
+    margin-top:16px;display:none}
+  .msg.show{display:block}
+  .msg.ok{background:rgba(26,158,117,0.15);border:1px solid rgba(26,158,117,0.3);color:#1a9e75}
+  .msg.err{background:rgba(224,85,85,0.15);border:1px solid rgba(224,85,85,0.3);color:#e05555}
+  .msg.loading{background:rgba(240,180,41,0.15);border:1px solid rgba(240,180,41,0.3);color:#f0b429}
+  .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-family:'Space Mono',monospace;font-weight:700}
+  .badge-granted{background:#d4f0e4;color:#1a6a3a}
+  .badge-pending{background:#fef3d7;color:#7a5000}
+  .badge-provisional{background:#dde8f5;color:#1e4080}
+  .divider{height:1px;background:rgba(255,255,255,0.06);margin:24px 0}
+  .tip{font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;margin-top:6px;line-height:1.5}
+  select option{background:#0a162e;color:white}
+  .rebuild-notice{background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.2);
+    padding:12px 16px;border-radius:3px;font-size:12px;color:rgba(255,255,255,0.5);margin-top:16px}
+  .rebuild-notice strong{color:#f0b429}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="loginScreen">
+  <div class="login-box">
+    <div class="logo">EML <span>Admin</span></div>
+    <div class="subtitle">ENERGY MATERIALS LABORATORY</div>
+    <input type="password" id="loginPw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginErr" style="color:#e05555;font-size:12px;font-family:'Space Mono',monospace;margin-bottom:12px;display:none">Wrong password</div>
+    <button class="btn" onclick="doLogin()">LOGIN →</button>
+    <p style="margin-top:16px;font-size:11px;color:rgba(255,255,255,0.2);font-family:'Space Mono',monospace">
+      <a href="https://eml-group.netlify.app" style="color:#f0b429;text-decoration:none">← Back to site</a>
+    </p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="topbar">
+    <div class="topbar-brand">⚙ EML Admin <span>eml-group.netlify.app</span></div>
+    <div class="topbar-right">
+      <span id="globalStatus" class="status" style="display:none"></span>
+      <a href="https://eml-group.netlify.app" target="_blank" style="font-size:11px;color:#f0b429;font-family:'Space Mono',monospace;text-decoration:none">View Site ↗</a>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="nav-item active" onclick="showPage('patents')" id="nav-patents">
+        <span class="nav-icon">📋</span><span class="nav-label">Patents</span>
+      </div>
+      <div class="nav-item" onclick="showPage('papers')" id="nav-papers">
+        <span class="nav-icon">📄</span><span class="nav-label">Publications</span>
+      </div>
+      <div class="nav-item" onclick="showPage('members')" id="nav-members">
+        <span class="nav-icon">👥</span><span class="nav-label">Team Members</span>
+      </div>
+      <div class="nav-item" onclick="showPage('text')" id="nav-text">
+        <span class="nav-icon">✏️</span><span class="nav-label">Edit Text</span>
+      </div>
+      <div class="nav-item" onclick="showPage('setup')" id="nav-setup">
+        <span class="nav-icon">⚙️</span><span class="nav-label">Setup</span>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- PATENTS PAGE -->
+      <div class="page active" id="page-patents">
+        <div class="page-title">📋 Add New Patent</div>
+        <div class="page-desc">Fill in the patent details below and click Add Patent. The site will update automatically in ~30 seconds.</div>
+        <div class="card">
+          <div class="card-title">📋 Patent Details</div>
+          <div class="grid-2">
+            <div class="full">
+              <label>Title *</label>
+              <input type="text" id="pat-title" placeholder="Full patent title">
+            </div>
+            <div>
+              <label>Patent Number</label>
+              <input type="text" id="pat-number" placeholder="e.g. US11795521B2">
+            </div>
+            <div>
+              <label>Status</label>
+              <select id="pat-status">
+                <option value="Provisional">Provisional</option>
+                <option value="Pending">Pending</option>
+                <option value="Granted">Granted</option>
+              </select>
+            </div>
+            <div>
+              <label>Inventors *</label>
+              <input type="text" id="pat-inventors" placeholder="Name1, Name2, Nageh K. Allam">
+            </div>
+            <div>
+              <label>Filed Year</label>
+              <input type="number" id="pat-filed" placeholder="e.g. 2024" value="2024">
+            </div>
+            <div class="full">
+              <label>Google Patents URL (if granted)</label>
+              <input type="text" id="pat-url" placeholder="https://patents.google.com/patent/US...">
+            </div>
+          </div>
+          <button class="btn btn-sm" onclick="addPatent()" style="margin-top:8px">＋ Add Patent</button>
+          <div class="msg" id="pat-msg"></div>
+          <div class="rebuild-notice">⏱ After saving, <strong>Netlify rebuilds automatically</strong> — changes are live in ~30 seconds.</div>
+        </div>
+      </div>
+
+      <!-- PUBLICATIONS PAGE -->
+      <div class="page" id="page-papers">
+        <div class="page-title">📄 Add New Publication</div>
+        <div class="page-desc">Add a paper manually. Publications from Semantic Scholar are fetched automatically — only add papers not yet appearing on the site.</div>
+        <div class="card">
+          <div class="card-title">📄 Paper Details</div>
+          <div class="grid-2">
+            <div class="full">
+              <label>Title *</label>
+              <input type="text" id="paper-title" placeholder="Full paper title">
+            </div>
+            <div class="full">
+              <label>Authors * (comma separated)</label>
+              <input type="text" id="paper-authors" placeholder="A. Author, B. Author, Nageh K. Allam">
+            </div>
+            <div>
+              <label>Journal / Venue *</label>
+              <input type="text" id="paper-venue" placeholder="e.g. ACS Applied Materials">
+            </div>
+            <div>
+              <label>Year *</label>
+              <input type="number" id="paper-year" placeholder="2026" value="2026">
+            </div>
+            <div class="full">
+              <label>DOI (optional)</label>
+              <input type="text" id="paper-doi" placeholder="e.g. 10.1021/acsami.5c00001">
+            </div>
+          </div>
+          <button class="btn btn-sm" onclick="addPaper()" style="margin-top:8px">＋ Add Publication</button>
+          <div class="msg" id="paper-msg"></div>
+          <div class="rebuild-notice">⏱ After saving, <strong>Netlify rebuilds automatically</strong> — changes are live in ~30 seconds.</div>
+        </div>
+      </div>
+
+      <!-- MEMBERS PAGE -->
+      <div class="page" id="page-members">
+        <div class="page-title">👥 Add New Member</div>
+        <div class="page-desc">Add a new team member. For photos, upload them to GitHub directly at public/team/filename.jpg</div>
+        <div class="card">
+          <div class="card-title">👥 Member Details</div>
+          <div class="grid-2">
+            <div>
+              <label>Full Name *</label>
+              <input type="text" id="mem-name" placeholder="e.g. Ahmed Mohamed">
+            </div>
+            <div>
+              <label>Role / Position *</label>
+              <input type="text" id="mem-role" placeholder="e.g. Master's Student">
+            </div>
+            <div>
+              <label>Group *</label>
+              <select id="mem-group">
+                <option value="Postdoctoral Researchers &amp; Senior Scientists">Postdoctoral Researchers</option>
+                <option value="PhD Students">PhD Students</option>
+                <option value="Master's Students" selected>Master's Students</option>
+                <option value="Alumni">Alumni</option>
+                <option value="Lab Manager">Lab Manager</option>
+              </select>
+            </div>
+            <div>
+              <label>Email</label>
+              <input type="text" id="mem-email" placeholder="name@aucegypt.edu">
+            </div>
+            <div class="full">
+              <label>Research Interests (comma separated)</label>
+              <input type="text" id="mem-interests" placeholder="e.g. Supercapacitors, DFT, CO2 Reduction">
+            </div>
+            <div class="full">
+              <label>Short Note / Bio</label>
+              <input type="text" id="mem-note" placeholder="e.g. TA at AUC — Water Splitting Group">
+            </div>
+            <div class="full">
+              <label>Google Scholar URL (optional)</label>
+              <input type="text" id="mem-scholar" placeholder="https://scholar.google.com/citations?user=...">
+            </div>
+            <div class="full">
+              <label>Photo filename (optional)</label>
+              <input type="text" id="mem-photo" placeholder="e.g. team/ahmed-mohamed.jpg">
+              <p class="tip">Upload the photo to GitHub first: go to github.com/ezzyousef/eml-site → public/team → Add file → Upload</p>
+            </div>
+          </div>
+          <button class="btn btn-sm" onclick="addMember()" style="margin-top:8px">＋ Add Member</button>
+          <div class="msg" id="mem-msg"></div>
+          <div class="rebuild-notice">⏱ After saving, <strong>Netlify rebuilds automatically</strong> — changes are live in ~30 seconds.</div>
+        </div>
+      </div>
+
+      <!-- TEXT EDIT PAGE -->
+      <div class="page" id="page-text">
+        <div class="page-title">✏️ Edit Page Text</div>
+        <div class="page-desc">Find any text on the site and replace it. Copy the exact text you want to change from the live site.</div>
+        <div class="card">
+          <div class="card-title">✏️ Find & Replace Text</div>
+          <div>
+            <label>Current text (copy exactly from the site) *</label>
+            <textarea id="text-old" rows="3" placeholder="Paste the exact text you want to change..."></textarea>
+          </div>
+          <div>
+            <label>New text *</label>
+            <textarea id="text-new" rows="3" placeholder="Type the new text here..."></textarea>
+          </div>
+          <button class="btn btn-sm" onclick="editText()" style="margin-top:8px">✓ Save Change</button>
+          <div class="msg" id="text-msg"></div>
+          <div class="rebuild-notice">⏱ After saving, <strong>Netlify rebuilds automatically</strong> — changes are live in ~30 seconds.</div>
+        </div>
+      </div>
+
+      <!-- SETUP PAGE -->
+      <div class="page" id="page-setup">
+        <div class="page-title">⚙️ Setup</div>
+        <div class="page-desc">Configure the GitHub token so the admin panel can save changes.</div>
+        <div class="card">
+          <div class="card-title">🔑 GitHub Token</div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.7">
+            This token allows the admin panel to save changes directly to GitHub.<br>
+            It is stored only in <strong style="color:#f0b429">Netlify's environment variables</strong> — never in the browser.
+          </p>
+          <label>Current token status</label>
+          <div id="token-status" style="padding:12px;background:rgba(255,255,255,0.04);border-radius:3px;font-family:'Space Mono',monospace;font-size:12px;color:#8a9ab0;margin-bottom:16px">
+            Checking...
+          </div>
+          <div class="divider"></div>
+          <p style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:16px">
+            To set up the token, go to:<br>
+            <strong style="color:#f0b429">Netlify → eml-group → Site configuration → Environment variables</strong><br>
+            Add a variable named <strong style="color:#f0b429">GH_TOKEN</strong> with your GitHub Personal Access Token as the value.
+          </p>
+          <a href="https://github.com/settings/tokens/new?scopes=repo&description=EML+Admin" target="_blank">
+            <button class="btn btn-outline btn-sm">Generate GitHub Token ↗</button>
+          </a>
+          <a href="https://app.netlify.com/projects/eml-group/configuration/env" target="_blank" style="margin-left:10px">
+            <button class="btn btn-sm">Open Netlify Env Variables ↗</button>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+let adminPassword = "";
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+async function doLogin() {
+  const pw = document.getElementById("loginPw").value;
+  const hash = await sha256(pw);
+  if (hash === "da25c5b5903cfd4b93885fe8a67aed43e871cc8b5cad8eb95988e49cb16da8d9") {
+    adminPassword = pw;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    checkTokenStatus();
+  } else {
+    document.getElementById("loginErr").style.display = "block";
+  }
+}
+
+function logout() {
+  adminPassword = "";
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("loginPw").value = "";
+}
+
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  document.getElementById("page-" + name).classList.add("active");
+  document.getElementById("nav-" + name).classList.add("active");
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = "msg show " + type;
+  if (type === "ok") setTimeout(() => el.classList.remove("show"), 8000);
+}
+
+function setGlobalStatus(text, type) {
+  const el = document.getElementById("globalStatus");
+  el.textContent = text;
+  el.className = "status " + type;
+  el.style.display = "inline-block";
+  if (type === "success") setTimeout(() => el.style.display = "none", 6000);
+}
+
+async function callAdmin(action, data, msgId) {
+  showMsg(msgId, "⏳ Saving to GitHub…", "loading");
+  setGlobalStatus("⏳ Saving…", "loading");
+  try {
+    const res = await fetch("/api/admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: adminPassword, action, data })
+    });
+    const json = await res.json();
+    if (res.ok && json.ok) {
+      showMsg(msgId, "✓ " + json.message, "ok");
+      setGlobalStatus("✓ Saved! Rebuilding…", "success");
+    } else {
+      showMsg(msgId, "✗ " + (json.error || "Unknown error"), "err");
+      setGlobalStatus("✗ Error", "error");
+    }
+  } catch (e) {
+    showMsg(msgId, "✗ Network error: " + e.message, "err");
+    setGlobalStatus("✗ Error", "error");
+  }
+}
+
+async function addPatent() {
+  const title = document.getElementById("pat-title").value.trim();
+  const inventors = document.getElementById("pat-inventors").value.trim();
+  if (!title || !inventors) return showMsg("pat-msg", "✗ Title and Inventors are required", "err");
+  await callAdmin("add_patent", {
+    title, inventors,
+    number: document.getElementById("pat-number").value.trim(),
+    status: document.getElementById("pat-status").value,
+    filed: document.getElementById("pat-filed").value.trim(),
+    url: document.getElementById("pat-url").value.trim(),
+    assignee: "The American University in Cairo"
+  }, "pat-msg");
+  document.getElementById("pat-title").value = "";
+  document.getElementById("pat-inventors").value = "";
+  document.getElementById("pat-number").value = "";
+  document.getElementById("pat-url").value = "";
+}
+
+async function addPaper() {
+  const title = document.getElementById("paper-title").value.trim();
+  const authors = document.getElementById("paper-authors").value.trim();
+  const venue = document.getElementById("paper-venue").value.trim();
+  if (!title || !authors || !venue) return showMsg("paper-msg", "✗ Title, Authors and Venue are required", "err");
+  await callAdmin("add_paper", {
+    title, authors, venue,
+    year: document.getElementById("paper-year").value,
+    doi: document.getElementById("paper-doi").value.trim()
+  }, "paper-msg");
+  document.getElementById("paper-title").value = "";
+  document.getElementById("paper-authors").value = "";
+  document.getElementById("paper-venue").value = "";
+  document.getElementById("paper-doi").value = "";
+}
+
+async function addMember() {
+  const name = document.getElementById("mem-name").value.trim();
+  const role = document.getElementById("mem-role").value.trim();
+  if (!name || !role) return showMsg("mem-msg", "✗ Name and Role are required", "err");
+  await callAdmin("add_member", {
+    name, role,
+    group: document.getElementById("mem-group").value,
+    email: document.getElementById("mem-email").value.trim(),
+    interests: document.getElementById("mem-interests").value.trim(),
+    note: document.getElementById("mem-note").value.trim(),
+    scholar: document.getElementById("mem-scholar").value.trim(),
+    photo: document.getElementById("mem-photo").value.trim()
+  }, "mem-msg");
+  document.getElementById("mem-name").value = "";
+  document.getElementById("mem-role").value = "";
+  document.getElementById("mem-email").value = "";
+  document.getElementById("mem-interests").value = "";
+  document.getElementById("mem-note").value = "";
+  document.getElementById("mem-scholar").value = "";
+  document.getElementById("mem-photo").value = "";
+}
+
+async function editText() {
+  const oldText = document.getElementById("text-old").value;
+  const newText = document.getElementById("text-new").value;
+  if (!oldText || !newText) return showMsg("text-msg", "✗ Both fields are required", "err");
+  await callAdmin("edit_text", { oldText, newText }, "text-msg");
+}
+
+async function checkTokenStatus() {
+  try {
+    const res = await fetch("/api/admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: adminPassword, action: "check_token", data: {} })
+    });
+    const json = await res.json();
+    const el = document.getElementById("token-status");
+    if (json.tokenOk) {
+      el.innerHTML = '<span style="color:#1a9e75">✓ GitHub token is configured and working</span>';
+    } else {
+      el.innerHTML = '<span style="color:#e05555">✗ GitHub token not set — see setup instructions below</span>';
+    }
+  } catch {}
+}
+
+document.getElementById("loginPw").focus();
+</script>
+</body>
+</html>
