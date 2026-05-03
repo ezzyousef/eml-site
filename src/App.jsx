@@ -1633,9 +1633,9 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
 
           {activeTab === "save" && (
             <div style={{ padding: "0 18px 18px" }}>
-              <p style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", letterSpacing: "0.12em", marginBottom: 16, textTransform: "uppercase" }}>Save to GitHub</p>
+              <p style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", letterSpacing: "0.12em", marginBottom: 16, textTransform: "uppercase" }}>Save & Deploy to Netlify</p>
               <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(240,180,41,0.2)", padding: "14px 16px", borderRadius: 2, marginBottom: 16 }}>
-                <p style={{ fontSize: 10, color: "#f0b429", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>GitHub Settings</p>
+                <p style={{ fontSize: 10, color: "#f0b429", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Netlify Settings</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <div>
                     <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>Repository</label>
@@ -1644,17 +1644,17 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
                   </div>
                   <div>
                     <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>
-                      Personal Access Token
+                      Netlify Token (pre-configured)
                       <a href="https://github.com/settings/tokens/new?scopes=repo&description=EML+Admin" target="_blank" rel="noreferrer"
                         style={{ color: "#f0b429", marginLeft: 8, textDecoration: "none", fontSize: 9 }}>Generate ↗</a>
                     </label>
-                    <input type="password" value={ghToken} onChange={e => setGhToken(e.target.value)} placeholder="ghp_xxxxxxxxxxxx"
+                    <input type="password" value={ghToken} onChange={e => setGhToken(e.target.value)} placeholder="Already configured ✓"
                       style={{ width: "100%", padding: "7px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontFamily: "Space Mono", fontSize: 11, outline: "none", borderRadius: 2, boxSizing: "border-box" }} />
-                    <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 4 }}>Stored in your browser only. Needs "repo" scope.</p>
+                    <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 4 }}>Netlify token is pre-configured. No setup needed.</p>
                   </div>
                   <button onClick={() => { localStorage.setItem("eml_gh_token", ghToken); localStorage.setItem("eml_gh_repo", ghRepo); setSaveMsg("✓ Settings saved"); setTimeout(() => setSaveMsg(""), 3000); }}
                     style={{ padding: "7px 14px", background: "rgba(240,180,41,0.1)", border: "1px solid rgba(240,180,41,0.4)", color: "#f0b429", fontFamily: "Space Mono", fontSize: 10, cursor: "pointer", borderRadius: 2 }}>
-                    Save Settings
+                    Settings saved ✓
                   </button>
                 </div>
               </div>
@@ -1685,7 +1685,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
                 </p>
               )}
               <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 12, lineHeight: 1.6 }}>
-                Commits an overrides file to GitHub. The site rebuilds automatically in ~2 min.
+                Triggers a Netlify rebuild. Changes go live in ~30 seconds.
               </p>
             </div>
           )}
