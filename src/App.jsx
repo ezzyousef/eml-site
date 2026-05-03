@@ -1304,6 +1304,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
   const [loggedIn, setLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [pw, setPw] = useState("");
+  const [adminPw, setAdminPw] = useState("");
   const [pwErr, setPwErr] = useState(false);
   const [editOn, setEditOn] = useState(false);
   const [showPanel, setShowPanel] = useState(false);
@@ -1373,7 +1374,8 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
 
   const handleLogin = async () => {
     if (await checkPassword(pw)) {
-      setLoggedIn(true); setShowLogin(false); setPwErr(false); setPw("");
+      setLoggedIn(true); setShowLogin(false); setPwErr(false);
+      setAdminPw(pw); setPw("");
       setShowPanel(true); enableEdit();
     } else setPwErr(true);
   };
@@ -1647,7 +1649,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
               </div>
 
               {/* Save button */}
-              <button onClick={() => saveToNetlify(pw || "")} disabled={saving}
+              <button onClick={() => saveToNetlify(adminPw)} disabled={saving}
                 style={{ width: "100%", padding: "14px", background: saving ? "#333" : "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", cursor: saving ? "not-allowed" : "pointer", borderRadius: 2, textTransform: "uppercase", marginBottom: 10 }}>
                 {saving ? "⏳ Saving…" : "💾 SAVE & PUBLISH TO NETLIFY"}
               </button>
