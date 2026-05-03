@@ -1317,11 +1317,11 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
 
-  const saveToNetlify = async (adminPw) => {
+  const saveToNetlify = async (pwArg) => {
     setSaving(true); setSaveMsg("Saving…");
     try {
       const patch = {
-        token: adminPw,
+        token: pwArg,
         memberOverrides,
         patents: (() => { try { return JSON.parse(localStorage.getItem("eml_patents") || "null"); } catch { return null; } })(),
       };
@@ -1649,7 +1649,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
               </div>
 
               {/* Save button */}
-              <button onClick={() => saveToNetlify(adminPw)} disabled={saving}
+              <button onClick={() => { const p = adminPw; saveToNetlify(p); }} disabled={saving}
                 style={{ width: "100%", padding: "14px", background: saving ? "#333" : "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", cursor: saving ? "not-allowed" : "pointer", borderRadius: 2, textTransform: "uppercase", marginBottom: 10 }}>
                 {saving ? "⏳ Saving…" : "💾 SAVE & PUBLISH TO NETLIFY"}
               </button>
