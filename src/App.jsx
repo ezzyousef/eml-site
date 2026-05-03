@@ -1311,6 +1311,41 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
   const [cropTarget, setCropTarget] = useState(null);
   const [projForm, setProjForm] = useState({ title: "", tag: "", icon: "🔬", description: "", highlights: "" });
   const [addProjOpen, setAddProjOpen] = useState(false);
+  const [ghToken, setGhToken] = useState(() => { try { return localStorage.getItem("eml_gh_token") || ""; } catch { return ""; } });
+  const [ghRepo, setGhRepo] = useState(() => { try { return localStorage.getItem("eml_gh_repo") || "ezzyousef/eml-site"; } catch { return "ezzyousef/eml-site"; } });
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
+
+  const saveToGitHub = async () => {
+    if (!ghToken.trim()) { setSaveMsg("✗ Please enter your GitHub token in settings above"); return; }
+    setSaving(true); setSaveMsg("Saving…");
+    try {
+      const patch = {
+        memberOverrides,
+        patents: (() => { try { return JSON.parse(localStorage.getItem("eml_patents") || "null"); } catch { return null; } })(),
+        savedAt: new Date().toISOString(),
+      };
+      const path = "public/eml-overrides.json";
+      const apiBase = `https://api.github.com/repos/${ghRepo.trim()}/contents/${path}`;
+      let sha = "";
+      try {
+        const existing = await fetch(apiBase, { headers: { Authorization: `Bearer ${ghToken.trim()}`, Accept: "application/vnd.github+json" } });
+        if (existing.ok) { const d = await existing.json(); sha = d.sha; }
+      } catch {}
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(patch, null, 2))));
+      const body = { message: `EML admin save — ${new Date().toLocaleDateString()}`, content: encoded, ...(sha ? { sha } : {}) };
+      const res = await fetch(apiBase, { method: "PUT", headers: { Authorization: `Bearer ${ghToken.trim()}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (res.ok) {
+        setSaveMsg("✓ Saved! Site updates in ~2 min.");
+        try { localStorage.setItem("eml_gh_token", ghToken); localStorage.setItem("eml_gh_repo", ghRepo); } catch {}
+      } else {
+        const err = await res.json();
+        setSaveMsg("✗ Error: " + (err.message || "Unknown error"));
+      }
+    } catch (e) { setSaveMsg("✗ " + e.message); }
+    setSaving(false);
+    setTimeout(() => setSaveMsg(""), 8000);
+  };
 
   // Secret keyboard shortcut: Ctrl + Shift + A
   useEffect(() => {
@@ -1380,6 +1415,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
     { id: "members", label: "👥 Photos" },
     { id: "projects", label: "📋 Projects" },
     { id: "logos", label: "🖼 Logos" },
+    { id: "save", label: "💾 Save" },
   ];
 
   return (
