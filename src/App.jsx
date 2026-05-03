@@ -1316,36 +1316,46 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
 
-  const saveToGitHub = async () => {
-    if (!ghToken.trim()) { setSaveMsg("✗ Please enter your GitHub token in settings above"); return; }
+  const NETLIFY_SITE_ID = "a6418ab5-a865-4500-b559-2fd09b465cf5";
+  const NETLIFY_TOKEN   = "nfp_v5A8syPCMZ5pPPVMJYM5wVyzMCTGsmANf7a0";
+
+  const saveToNetlify = async () => {
     setSaving(true); setSaveMsg("Saving…");
     try {
+      // 1. Save overrides to GitHub (so Netlify picks them up on rebuild)
       const patch = {
         memberOverrides,
         patents: (() => { try { return JSON.parse(localStorage.getItem("eml_patents") || "null"); } catch { return null; } })(),
         savedAt: new Date().toISOString(),
       };
-      const path = "public/eml-overrides.json";
-      const apiBase = `https://api.github.com/repos/${ghRepo.trim()}/contents/${path}`;
-      let sha = "";
-      try {
-        const existing = await fetch(apiBase, { headers: { Authorization: `Bearer ${ghToken.trim()}`, Accept: "application/vnd.github+json" } });
-        if (existing.ok) { const d = await existing.json(); sha = d.sha; }
-      } catch {}
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(patch, null, 2))));
-      const body = { message: `EML admin save — ${new Date().toLocaleDateString()}`, content: encoded, ...(sha ? { sha } : {}) };
-      const res = await fetch(apiBase, { method: "PUT", headers: { Authorization: `Bearer ${ghToken.trim()}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const ghRepo = localStorage.getItem("eml_gh_repo") || "ezzyousef/eml-site";
+      const ghToken = localStorage.getItem("eml_gh_token") || "";
+      if (ghToken) {
+        const path = "public/eml-overrides.json";
+        const apiBase = `https://api.github.com/repos/${ghRepo}/contents/${path}`;
+        let sha = "";
+        try { const r = await fetch(apiBase, { headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json" } }); if (r.ok) { sha = (await r.json()).sha; } } catch {}
+        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(patch, null, 2))));
+        await fetch(apiBase, { method: "PUT", headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: JSON.stringify({ message: `EML save — ${new Date().toLocaleDateString()}`, content: encoded, ...(sha ? { sha } : {}) }) });
+      }
+
+      // 2. Trigger Netlify rebuild
+      const res = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/builds`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${NETLIFY_TOKEN}`, "Content-Type": "application/json" },
+      });
       if (res.ok) {
-        setSaveMsg("✓ Saved! Site updates in ~2 min.");
-        try { localStorage.setItem("eml_gh_token", ghToken); localStorage.setItem("eml_gh_repo", ghRepo); } catch {}
+        setSaveMsg("✓ Saved! Site rebuilding — live in ~30 seconds.");
       } else {
         const err = await res.json();
-        setSaveMsg("✗ Error: " + (err.message || "Unknown error"));
+        setSaveMsg("✗ Netlify error: " + (err.message || "Unknown"));
       }
     } catch (e) { setSaveMsg("✗ " + e.message); }
     setSaving(false);
-    setTimeout(() => setSaveMsg(""), 8000);
+    setTimeout(() => setSaveMsg(""), 10000);
   };
+
+  const saveToGitHub = saveToNetlify;
 
   // Secret keyboard shortcut: Ctrl + Shift + A
   useEffect(() => {
@@ -1667,7 +1677,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
               </div>
               <button onClick={saveToGitHub} disabled={saving}
                 style={{ width: "100%", padding: "14px", background: saving ? "#333" : "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", cursor: saving ? "not-allowed" : "pointer", borderRadius: 2, textTransform: "uppercase", marginBottom: 10 }}>
-                {saving ? "⏳ Saving…" : "💾 Save & Publish to GitHub"}
+                {saving ? "⏳ Rebuilding…" : "💾 Save & Publish to Netlify"}
               </button>
               {saveMsg && (
                 <p style={{ fontSize: 11, fontFamily: "Space Mono", color: saveMsg.startsWith("✓") ? "#1a9e75" : "#e05555", textAlign: "center", padding: "8px", background: saveMsg.startsWith("✓") ? "rgba(26,158,117,0.1)" : "rgba(224,85,85,0.1)", borderRadius: 2 }}>
