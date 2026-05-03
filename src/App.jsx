@@ -744,124 +744,61 @@ function AUCLogo() {
 }
 
 // 2026 papers — always shown at the top regardless of API
-const papers2026 = [
-  {
-    year: 2026, citationCount: 6,
-    title: "Artificial Intelligence-Driven Materials Design for Next-Generation Sustainable Energy Technologies",
-    authors: [{ name: "SM Fawzy" }, { name: "MK M. Ali" }, { name: "Nageh K. Allam" }],
-    venue: "ACS Sustainable Chemistry & Engineering 14, 4745–4761",
-    externalIds: { DOI: "10.1021/acssuschemeng.6c01084" },
-  },
-  {
-    year: 2026, citationCount: 0,
-    title: "Multiscale Thermoelectric Transport: Bridging Quantum Mechanics to Macroscopic Systems Through the Landauer-Boltzmann Paradigm",
-    authors: [{ name: "MI Abdelaziz" }, { name: "SA Eldib" }, { name: "Nageh K. Allam" }],
-    venue: "Journal of Materials Chemistry A",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 0,
-    title: "Ultrathin MoS₂-Decorated N-Doped Carbon with Hierarchical Porosity for High-Capacity, Low-Energy Capacitive Deionization with Outstanding Cycling Stability",
-    authors: [{ name: "MA Ghanem" }, { name: "MM Taha" }, { name: "G Hamdy" }, { name: "FA Taher" }, { name: "Nageh K. Allam" }],
-    venue: "Journal of Materials Chemistry A",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 0,
-    title: "Engineering reline/carboxymethyl cellulose eutectogel electrolytes through nanoscale water confinement and coordination-driven ion percolation",
-    authors: [{ name: "AA Akar" }, { name: "MA Moselhy" }, { name: "GE Khedr" }, { name: "E Yousef" }, { name: "Nageh K. Allam" }],
-    venue: "Chemical Engineering Journal 537, 176245",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 1,
-    title: "Hierarchical aerogel-confined deep eutectic electrolytes with complete water immobilization for high-performance, freeze-tolerant supercapacitors",
-    authors: [{ name: "MA Moselhy" }, { name: "GE Khedr" }, { name: "E Yousef" }, { name: "AA Akar" }, { name: "Nageh K. Allam" }],
-    venue: "Journal of Materials Chemistry A",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 0,
-    title: "Morphological and structural evolution of time-engineered Co-Fe bimetallic redox systems for high-performance hybrid supercapacitors",
-    authors: [{ name: "HM El Sharkawy" }, { name: "AM Mohamed" }, { name: "Nageh K. Allam" }],
-    venue: "Electrochimica Acta 570, 148940",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 4,
-    title: "Machine Learning Guidelines for Designing Next-Generation Nanocomposite Membranes for CO₂ Capture",
-    authors: [{ name: "D Sallam" }, { name: "BS Shaheen" }, { name: "Nageh K. Allam" }],
-    venue: "Green Chemistry 28, 1286–1315",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 3,
-    title: "Polymerizable Acrylamide-Based Deep Eutectic Solvents for Flexible Thermoelectric Devices",
-    authors: [{ name: "SAS Eldib" }, { name: "MIM Abdelaziz" }, { name: "GE Khedr" }, { name: "HN Akl" }, { name: "Nageh K. Allam" }],
-    venue: "ACS Applied Engineering Materials 4, 1551–1560",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 1,
-    title: "Synergistic structural and electrochemical engineering of NiFe₂O₄ spinel cathodes with record charge efficiency for sustainable water capacitive deionization",
-    authors: [{ name: "RA Hassan" }, { name: "MM Taha" }, { name: "MG Zonkol" }, { name: "HG Salem" }, { name: "Nageh K. Allam" }],
-    venue: "Separation and Purification Technology 384, 136353",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 3,
-    title: "Biomimetic CsCl: EG/PVA–NaOH eutectogels for high-performance ionic thermoelectrics and sustainable low-grade heat harvesting",
-    authors: [{ name: "MIM Abdelaziz" }, { name: "SAS Eldib" }, { name: "GE Khedr" }, { name: "Nageh K. Allam" }],
-    venue: "Journal of Materials Chemistry A",
-    externalIds: {},
-  },
-  {
-    year: 2026, citationCount: 0,
-    title: "Integrated CO₂ Capture and Conversion: Dual-Functional Materials, Mechanisms, and Pathways to Industrial Decarbonization",
-    authors: [{ name: "MA Elokl" }, { name: "AG Ali" }, { name: "AM Abdelmohsen" }, { name: "AA Taha" }, { name: "AA Ashour" }, { name: "S Elshabrawy" }, { name: "Nageh K. Allam" }],
-    venue: "EES Catalysis (RSC Publishing)",
-    externalIds: { DOI: "10.1039/d5ey00322a" },
-  },
-  {
-    year: 2026, citationCount: 0,
-    title: "Ultralow-Loading Co₂VO₄ Nanoparticles Embedded in PMMA/PVDF Nanocomposite Membranes for Comprehensive UV and Blue Light Attenuation",
-    authors: [{ name: "Esraa Mourad" }, { name: "GE Khedr" }, { name: "RM El-Sherif" }, { name: "Nageh K. Allam" }],
-    venue: "ACS Omega",
-    externalIds: { DOI: "10.1021/acsomega.5c11512" },
-  },
+// ── KNOWN PATENTS (always shown, user can add more) ───────────────────────
+const DEFAULT_PATENTS = [
+  { number: "US11795521B2", title: "Extraction of Iron (III) Oxide from Different Iron-Containing Ores", inventors: "Nageh K. Allam, Mahmoud M. Aly", assignee: "The American University in Cairo", filed: "2018", status: "Granted", url: "https://patents.google.com/patent/US11795521B2/en" },
+  { number: "US App.", title: "Hydrogel Electrolyte Composition for Energy Storage Devices with Anti-Freeze and Non-Flammable Properties", inventors: "Nageh K. Allam, Abdelrahman A. M. Ismail", assignee: "The American University in Cairo", filed: "2023", status: "Pending", url: "" },
+  { number: "US Prov. 62/262743", title: "Sub 100 nm Oxidized Transition Metal Tubular Architectures", inventors: "Menna Samir, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2016", status: "Provisional", url: "" },
+  { number: "US Prov. 62/262685", title: "Ti-based Functional Nanoarchitectures as Drug Eluting Stents", inventors: "Yomna E. Saleh, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2016", status: "Provisional", url: "" },
+  { number: "US Prov. 61/985504", title: "Efficient Charge Separation in Self-Assembled Nanostructured Photoanodes with Staggered Bandgap for Solar Energy Conversion", inventors: "R. Nashed, P. Szymanski, M. A. El-Sayed, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2014", status: "Provisional", url: "" },
+  { number: "US Prov. 62/457533", title: "Magnetolysis — Electrochemical Water Splitting Using Magnetic Fields", inventors: "Hady Soliman, Mohamed Shokeir, Sandy El Moghazi, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2017", status: "Provisional", url: "" },
+  { number: "US Prov. 62/509432", title: "Extraction of Iron (III) Oxide From Different Iron-Containing Ores (Provisional)", inventors: "Mahmoud A. Aly, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2017", status: "Provisional", url: "" },
 ];
-const AUTHOR_ID = "8643365"; // Prof. Nageh K. Allam — Semantic Scholar ID
-const SCHOLAR_URL = "https://scholar.google.com/citations?user=18v00ZIAAAAJ&hl=en&sortby=pubdate";
 
-// Try multiple endpoints to get publications
+// ── 2026 HARDCODED PAPERS — always shown ──────────────────────────────────
+const papers2026 = [
+  { year: 2026, citationCount: 6, title: "Artificial Intelligence-Driven Materials Design for Next-Generation Sustainable Energy Technologies", authors: [{ name: "SM Fawzy" }, { name: "MK M. Ali" }, { name: "Nageh K. Allam" }], venue: "ACS Sustainable Chemistry & Engineering 14, 4745–4761", externalIds: { DOI: "10.1021/acssuschemeng.6c01084" } },
+  { year: 2026, citationCount: 0, title: "Multiscale Thermoelectric Transport: Bridging Quantum Mechanics to Macroscopic Systems Through the Landauer-Boltzmann Paradigm", authors: [{ name: "MI Abdelaziz" }, { name: "SA Eldib" }, { name: "Nageh K. Allam" }], venue: "Journal of Materials Chemistry A", externalIds: {} },
+  { year: 2026, citationCount: 0, title: "Ultrathin MoS₂-Decorated N-Doped Carbon with Hierarchical Porosity for High-Capacity, Low-Energy Capacitive Deionization", authors: [{ name: "MA Ghanem" }, { name: "MM Taha" }, { name: "Nageh K. Allam" }], venue: "Journal of Materials Chemistry A", externalIds: {} },
+  { year: 2026, citationCount: 0, title: "Engineering reline/carboxymethyl cellulose eutectogel electrolytes through nanoscale water confinement", authors: [{ name: "AA Akar" }, { name: "MA Moselhy" }, { name: "GE Khedr" }, { name: "E Yousef" }, { name: "Nageh K. Allam" }], venue: "Chemical Engineering Journal 537, 176245", externalIds: {} },
+  { year: 2026, citationCount: 1, title: "Hierarchical aerogel-confined deep eutectic electrolytes with complete water immobilization for freeze-tolerant supercapacitors", authors: [{ name: "MA Moselhy" }, { name: "GE Khedr" }, { name: "E Yousef" }, { name: "AA Akar" }, { name: "Nageh K. Allam" }], venue: "Journal of Materials Chemistry A", externalIds: {} },
+  { year: 2026, citationCount: 0, title: "Morphological and structural evolution of time-engineered Co-Fe bimetallic redox systems for high-performance hybrid supercapacitors", authors: [{ name: "HM El Sharkawy" }, { name: "AM Mohamed" }, { name: "Nageh K. Allam" }], venue: "Electrochimica Acta 570, 148940", externalIds: {} },
+  { year: 2026, citationCount: 4, title: "Machine Learning Guidelines for Designing Next-Generation Nanocomposite Membranes for CO₂ Capture", authors: [{ name: "D Sallam" }, { name: "BS Shaheen" }, { name: "Nageh K. Allam" }], venue: "Green Chemistry 28, 1286–1315", externalIds: {} },
+  { year: 2026, citationCount: 3, title: "Polymerizable Acrylamide-Based Deep Eutectic Solvents for Flexible Thermoelectric Devices", authors: [{ name: "SAS Eldib" }, { name: "MIM Abdelaziz" }, { name: "GE Khedr" }, { name: "HN Akl" }, { name: "Nageh K. Allam" }], venue: "ACS Applied Engineering Materials 4, 1551–1560", externalIds: {} },
+  { year: 2026, citationCount: 1, title: "Synergistic structural and electrochemical engineering of NiFe₂O₄ spinel cathodes for sustainable water capacitive deionization", authors: [{ name: "RA Hassan" }, { name: "MM Taha" }, { name: "Nageh K. Allam" }], venue: "Separation and Purification Technology 384, 136353", externalIds: {} },
+  { year: 2026, citationCount: 3, title: "Biomimetic CsCl: EG/PVA–NaOH eutectogels for high-performance ionic thermoelectrics", authors: [{ name: "MIM Abdelaziz" }, { name: "SAS Eldib" }, { name: "GE Khedr" }, { name: "Nageh K. Allam" }], venue: "Journal of Materials Chemistry A", externalIds: {} },
+  { year: 2026, citationCount: 0, title: "Integrated CO₂ Capture and Conversion: Dual-Functional Materials, Mechanisms, and Pathways to Industrial Decarbonization", authors: [{ name: "MA Elokl" }, { name: "AG Ali" }, { name: "AM Abdelmohsen" }, { name: "Nageh K. Allam" }], venue: "EES Catalysis (RSC Publishing)", externalIds: { DOI: "10.1039/d5ey00322a" } },
+  { year: 2026, citationCount: 0, title: "Ultralow-Loading Co₂VO₄ Nanoparticles Embedded in PMMA/PVDF Nanocomposite Membranes for UV and Blue Light Attenuation", authors: [{ name: "Esraa Mourad" }, { name: "GE Khedr" }, { name: "Nageh K. Allam" }], venue: "ACS Omega", externalIds: { DOI: "10.1021/acsomega.5c11512" } },
+];
+
+const AUTHOR_ID = "8643365";
+const SCHOLAR_URL = "https://scholar.google.com/citations?user=18v00ZIAAAAJ&hl=en&sortby=pubdate";
+const SCHOLAR_PATENTS_URL = "https://patents.google.com/patent/search?inventor=Nageh+Allam&assignee=American+University+Cairo";
+
 async function fetchPapers() {
-  const base = `https://api.semanticscholar.org/graph/v1/author/${AUTHOR_ID}/papers?fields=title,year,authors,venue,externalIds,citationCount,openAccessPdf&limit=100`;
-  const endpoints = [
+  const base = `https://api.semanticscholar.org/graph/v1/author/${AUTHOR_ID}/papers?fields=title,year,authors,venue,externalIds,citationCount,openAccessPdf&limit=200`;
+  const proxies = [
     base,
     `https://corsproxy.io/?url=${encodeURIComponent(base)}`,
     `https://api.allorigins.win/get?url=${encodeURIComponent(base)}`,
-    `https://thingproxy.freeboard.io/fetch/${base}`,
   ];
-  for (const url of endpoints) {
+  for (const url of proxies) {
     try {
       const r = await fetch(url, { headers: { Accept: "application/json" } });
       if (!r.ok) continue;
       const raw = await r.json();
       const data = raw.contents ? JSON.parse(raw.contents) : raw;
-      const papers = (data.data || [])
-        .filter(p => p.year && p.title)
-        .sort((a, b) => (b.year || 0) - (a.year || 0));
+      const papers = (data.data || []).filter(p => p.year && p.title).sort((a, b) => (b.year || 0) - (a.year || 0));
       if (papers.length > 0) return papers;
     } catch { continue; }
   }
   throw new Error("All endpoints failed");
 }
 
+// ── PUBLICATIONS SECTION ───────────────────────────────────────────────────
 function PublicationsSection() {
   const { editOn } = useContext(EditContext);
   const [papers, setPapers] = useState(papers2026);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -870,235 +807,142 @@ function PublicationsSection() {
   const [pubForm, setPubForm] = useState({ title: "", authors: "", venue: "", year: new Date().getFullYear().toString(), doi: "" });
 
   useEffect(() => {
-    // Clear all old cache versions
-    ["eml_papers","eml_papers_time","eml_papers_v2","eml_papers_v3","eml_papers_v3_time"].forEach(k => sessionStorage.removeItem(k));
-
-    // Check new cache
-    const cached = sessionStorage.getItem("eml_papers_v4");
-    const cachedTime = sessionStorage.getItem("eml_papers_v4_time");
-    if (cached && cachedTime && Date.now() - parseInt(cachedTime) < 3600000) {
-      setPapers(JSON.parse(cached));
-      setLastUpdated(new Date(parseInt(cachedTime)));
-      return;
+    // Cache key with today's date — refreshes daily
+    const today = new Date().toISOString().slice(0, 10);
+    const cacheKey = `eml_papers_${today}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const { merged, ts } = JSON.parse(cached);
+        setPapers(merged);
+        setLastUpdated(new Date(ts));
+        return;
+      } catch {}
     }
-
     fetchPapers()
       .then(fetched => {
         const fetchedFiltered = fetched.filter(p =>
-          !papers2026.some(p26 => p.title.toLowerCase().slice(0,40) === p26.title.toLowerCase().slice(0,40))
+          !papers2026.some(p26 => p.title.toLowerCase().slice(0, 40) === p26.title.toLowerCase().slice(0, 40))
         );
         const merged = [...papers2026, ...fetchedFiltered];
-        const now = Date.now();
-        sessionStorage.setItem("eml_papers_v4", JSON.stringify(merged));
-        sessionStorage.setItem("eml_papers_v4_time", String(now));
+        const ts = Date.now();
+        sessionStorage.setItem(cacheKey, JSON.stringify({ merged, ts }));
+        // Clean old cache keys
+        Object.keys(sessionStorage).filter(k => k.startsWith("eml_papers_") && k !== cacheKey).forEach(k => sessionStorage.removeItem(k));
         setPapers(merged);
-        setLastUpdated(new Date(now));
+        setLastUpdated(new Date(ts));
       })
-      .catch(() => {
-        setPapers(papers2026);
-      });
+      .catch(() => setPapers(papers2026));
   }, []);
 
   const allPapers = [...extraPapers, ...papers];
-
   const filtered = allPapers.filter(p =>
-    search === "" ? true :
+    !search ? true :
     p.title.toLowerCase().includes(search.toLowerCase()) ||
     (p.venue || "").toLowerCase().includes(search.toLowerCase()) ||
     (p.authors || []).some(a => a.name.toLowerCase().includes(search.toLowerCase()))
   );
+  const visible = showAll ? filtered : filtered.slice(0, 12);
 
   const addPublication = () => {
     if (!pubForm.title.trim()) return;
-    const newPaper = {
-      year: parseInt(pubForm.year) || new Date().getFullYear(),
-      citationCount: 0,
-      title: pubForm.title,
-      authors: pubForm.authors.split(",").map(a => ({ name: a.trim() })),
-      venue: pubForm.venue,
-      externalIds: pubForm.doi ? { DOI: pubForm.doi } : {},
-      openAccessPdf: null,
-    };
-    setExtraPapers(prev => [newPaper, ...prev]);
+    setExtraPapers(prev => [{ year: parseInt(pubForm.year) || new Date().getFullYear(), citationCount: 0, title: pubForm.title, authors: pubForm.authors.split(",").map(a => ({ name: a.trim() })), venue: pubForm.venue, externalIds: pubForm.doi ? { DOI: pubForm.doi } : {}, openAccessPdf: null }, ...prev]);
     setPubForm({ title: "", authors: "", venue: "", year: new Date().getFullYear().toString(), doi: "" });
     setAddPubOpen(false);
   };
-
-  const visible = showAll ? filtered : filtered.slice(0, 10);
-
-  if (loading) return (
-    <div style={{ textAlign: "center", padding: "48px 0" }}>
-      <div style={{
-        width: 36, height: 36, border: "3px solid #d0d8e8",
-        borderTopColor: "#1e4080", borderRadius: "50%",
-        animation: "spin 0.8s linear infinite", margin: "0 auto 16px"
-      }} />
-      <p className="mono" style={{ fontSize: 12, color: "#8a9ab0", letterSpacing: "0.1em" }}>
-        FETCHING LATEST PUBLICATIONS…
-      </p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-
-  if (error) return (
-    <div style={{ padding: "32px 0" }}>
-      <p style={{ color: "#8a9ab0", fontSize: 14, marginBottom: 16 }}>
-        Live feed temporarily unavailable.
-      </p>
-      <a href={SCHOLAR_URL} target="_blank" rel="noreferrer"
-        className="btn-outline" style={{ display: "inline-block", padding: "10px 24px",
-          border: "1px solid #1e4080", color: "#1e4080", textDecoration: "none",
-          fontSize: 12, fontFamily: "Space Mono", letterSpacing: "0.08em" }}>
-        VIEW ALL ON GOOGLE SCHOLAR →
-      </a>
-    </div>
-  );
 
   return (
     <>
       {/* Status bar */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          background: "#d4f0e4", color: "#1a6a3a", padding: "4px 12px",
-          borderRadius: 20, fontSize: 11, fontFamily: "Space Mono", fontWeight: 700,
-          letterSpacing: "0.08em"
-        }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#d4f0e4", color: "#1a6a3a", padding: "4px 12px", borderRadius: 20, fontSize: 11, fontFamily: "Space Mono", fontWeight: 700, letterSpacing: "0.08em" }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#1a6a3a", animation: "pulse 2s infinite", display: "inline-block" }} />
-          LIVE · AUTO-UPDATED
+          LIVE · DAILY UPDATE
         </div>
         <span style={{ fontSize: 12, color: "#8a9ab0" }}>
           {papers.length} publications · Semantic Scholar
-          {lastUpdated && ` · Fetched ${lastUpdated.toLocaleTimeString()}`}
+          {lastUpdated && ` · Updated ${lastUpdated.toLocaleDateString()}`}
         </span>
-        <a href={SCHOLAR_URL} target="_blank" rel="noreferrer"
-          style={{ fontSize: 11, color: "#1e4080", fontFamily: "Space Mono", textDecoration: "none",
-            marginLeft: "auto", letterSpacing: "0.06em" }}>
+        <a href={SCHOLAR_URL} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#1e4080", fontFamily: "Space Mono", textDecoration: "none", marginLeft: "auto", letterSpacing: "0.06em" }}>
           Google Scholar ↗
         </a>
       </div>
       <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
 
       {/* Search */}
-      <div className="search-bar fade">
-        <input
-          className="search-input"
-          placeholder="Search by title, author, or journal…"
-          value={search}
-          onChange={e => { setSearch(e.target.value); setShowAll(false); }}
-        />
-        {search && (
-          <button onClick={() => setSearch("")}
-            style={{ padding: "0 14px", border: "1px solid #d0d8e8", background: "#f4f6fa",
-              cursor: "pointer", color: "#8a9ab0", fontSize: 18 }}>×</button>
-        )}
+      <div className="search-bar fade" style={{ marginBottom: 20 }}>
+        <input className="search-input" placeholder="Search by title, author, or journal…" value={search} onChange={e => { setSearch(e.target.value); setShowAll(false); }} />
+        {search && <button onClick={() => setSearch("")} style={{ padding: "0 14px", border: "1px solid #d0d8e8", background: "#f4f6fa", cursor: "pointer", color: "#8a9ab0", fontSize: 18 }}>×</button>}
       </div>
 
       {/* Papers list */}
-      <div className="pub-list" style={{ transitionDelay: "0.1s" }}>
-        {visible.length === 0 ? (
-          <p style={{ padding: "24px", color: "#8a9ab0", fontSize: 14 }}>No papers match your search.</p>
-        ) : visible.map((p, i) => {
-          const doi = p.externalIds?.DOI;
-          const arxiv = p.externalIds?.ArXiv;
-          const pdfUrl = p.openAccessPdf?.url;
-          const url = doi ? `https://doi.org/${doi}` : arxiv ? `https://arxiv.org/abs/${arxiv}` : null;
-          const authorNames = (p.authors || []).map(a => a.name);
-          return (
-            <div key={i} className="pub-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                <div className="pub-year mono">{p.year}</div>
-                {p.citationCount > 0 && (
-                  <div style={{
-                    fontSize: 10, fontFamily: "Space Mono", color: "#f0b429",
-                    background: "rgba(240,180,41,0.1)", padding: "2px 8px", borderRadius: 20,
-                    letterSpacing: "0.06em", whiteSpace: "nowrap"
-                  }}>
-                    {p.citationCount} citations
-                  </div>
-                )}
+      <div className="pub-list">
+        {visible.length === 0
+          ? <p style={{ padding: "24px", color: "#8a9ab0", fontSize: 14 }}>No papers match your search.</p>
+          : visible.map((p, i) => {
+            const doi = p.externalIds?.DOI;
+            const arxiv = p.externalIds?.ArXiv;
+            const pdfUrl = p.openAccessPdf?.url;
+            const url = doi ? `https://doi.org/${doi}` : arxiv ? `https://arxiv.org/abs/${arxiv}` : null;
+            const authorNames = (p.authors || []).map(a => a.name);
+            return (
+              <div key={i} className="pub-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                  <div className="pub-year mono">{p.year}</div>
+                  {p.citationCount > 0 && (
+                    <div style={{ fontSize: 10, fontFamily: "Space Mono", color: "#f0b429", background: "rgba(240,180,41,0.1)", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+                      {p.citationCount} citations
+                    </div>
+                  )}
+                </div>
+                <p className="pub-title serif">{url
+                  ? <a href={url} target="_blank" rel="noreferrer" style={{ color: "inherit", textDecoration: "none" }} onMouseOver={e => e.target.style.color="#1e4080"} onMouseOut={e => e.target.style.color="inherit"}>{p.title}</a>
+                  : p.title}
+                </p>
+                <p className="pub-authors">
+                  {authorNames.map((a, j) => (
+                    <span key={j}><span style={a.includes("Allam") ? { fontWeight: 700, color: "#1e4080" } : {}}>{a}</span>{j < authorNames.length - 1 && ", "}</span>
+                  ))}
+                </p>
+                {p.venue && <span className="pub-venue">{p.venue}</span>}
+                <div className="pub-tags">
+                  {url && <a href={url} target="_blank" rel="noreferrer" className="pub-tag">DOI</a>}
+                  {pdfUrl && <a href={pdfUrl} target="_blank" rel="noreferrer" className="pub-tag">PDF</a>}
+                  {arxiv && <a href={`https://arxiv.org/abs/${arxiv}`} target="_blank" rel="noreferrer" className="pub-tag">arXiv</a>}
+                </div>
               </div>
-              <p className="pub-title serif">{url
-                ? <a href={url} target="_blank" rel="noreferrer" style={{ color: "inherit", textDecoration: "none" }}
-                    onMouseOver={e => e.target.style.color="#1e4080"}
-                    onMouseOut={e => e.target.style.color="inherit"}>{p.title}</a>
-                : p.title}
-              </p>
-              <p className="pub-authors">
-                {authorNames.map((a, j) => (
-                  <span key={j}>
-                    <span style={a.includes("Allam") ? { fontWeight: 700, color: "#1e4080" } : {}}>
-                      {a}
-                    </span>
-                    {j < authorNames.length - 1 && ", "}
-                  </span>
-                ))}
-              </p>
-              {p.venue && <span className="pub-venue">{p.venue}</span>}
-              <div className="pub-tags">
-                {url && <a href={url} target="_blank" rel="noreferrer" className="pub-tag">DOI</a>}
-                {pdfUrl && <a href={pdfUrl} target="_blank" rel="noreferrer" className="pub-tag">PDF</a>}
-                {arxiv && <a href={`https://arxiv.org/abs/${arxiv}`} target="_blank" rel="noreferrer" className="pub-tag">arXiv</a>}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        }
       </div>
 
-      {/* Show more / external links */}
+      {/* Show more */}
       <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-        {filtered.length > 10 && (
-          <button onClick={() => setShowAll(!showAll)} style={{
-            background: "none", border: "1px solid #1e4080", color: "#1e4080",
-            padding: "8px 20px", fontSize: 12, fontFamily: "Space Mono",
-            cursor: "pointer", letterSpacing: "0.08em",
-          }}>
+        {filtered.length > 12 && (
+          <button onClick={() => setShowAll(!showAll)} style={{ background: "none", border: "1px solid #1e4080", color: "#1e4080", padding: "8px 20px", fontSize: 12, fontFamily: "Space Mono", cursor: "pointer", letterSpacing: "0.08em" }}>
             {showAll ? "SHOW LESS ↑" : `SHOW ALL ${filtered.length} PAPERS ↓`}
           </button>
         )}
-        <a href={SCHOLAR_URL} target="_blank" rel="noreferrer"
-          style={{ fontSize: 12, fontFamily: "Space Mono", color: "#8a9ab0", textDecoration: "none" }}>
-          Full list on Google Scholar →
-        </a>
+        <a href={SCHOLAR_URL} target="_blank" rel="noreferrer" style={{ fontSize: 12, fontFamily: "Space Mono", color: "#8a9ab0", textDecoration: "none" }}>Full list on Google Scholar →</a>
       </div>
 
       {/* Add Publication — edit mode only */}
       {editOn && (
         <div style={{ marginTop: 20 }}>
           {!addPubOpen ? (
-            <button onClick={() => setAddPubOpen(true)} style={{
-              width: "100%", padding: "12px", border: "2px dashed rgba(240,180,41,0.6)",
-              background: "rgba(240,180,41,0.05)", color: "#f0b429",
-              fontFamily: "Space Mono", fontSize: 11, letterSpacing: "0.12em",
-              cursor: "pointer", textTransform: "uppercase", borderRadius: 2,
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            }}
-            onMouseOver={e => e.currentTarget.style.background = "rgba(240,180,41,0.12)"}
-            onMouseOut={e => e.currentTarget.style.background = "rgba(240,180,41,0.05)"}
-            >＋ Add Publication Manually</button>
+            <button onClick={() => setAddPubOpen(true)} style={{ width: "100%", padding: "12px", border: "2px dashed rgba(240,180,41,0.6)", background: "rgba(240,180,41,0.05)", color: "#f0b429", fontFamily: "Space Mono", fontSize: 11, letterSpacing: "0.12em", cursor: "pointer", textTransform: "uppercase", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>＋ Add Publication Manually</button>
           ) : (
             <div style={{ border: "1px solid #f0b429", background: "#f8f6f2", padding: "20px 24px", borderRadius: 2 }}>
-              <p style={{ fontSize: 12, fontFamily: "Space Mono", color: "#1e4080", letterSpacing: "0.1em", marginBottom: 16, textTransform: "uppercase", fontWeight: 700 }}>
-                ＋ Add Publication
-              </p>
+              <p style={{ fontSize: 12, fontFamily: "Space Mono", color: "#1e4080", letterSpacing: "0.1em", marginBottom: 16, textTransform: "uppercase", fontWeight: 700 }}>＋ Add Publication</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px", marginBottom: 14 }}>
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={{ fontSize: 11, color: "#4a6080", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>Title *</label>
-                  <input value={pubForm.title} onChange={e => setPubForm(f => ({ ...f, title: e.target.value }))}
-                    placeholder="Full paper title"
-                    style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1px solid #d0d8e8", fontFamily: "Outfit, sans-serif", outline: "none", borderRadius: 2, boxSizing: "border-box", background: "white" }} />
+                  <input value={pubForm.title} onChange={e => setPubForm(f => ({ ...f, title: e.target.value }))} placeholder="Full paper title" style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1px solid #d0d8e8", fontFamily: "Outfit, sans-serif", outline: "none", borderRadius: 2, boxSizing: "border-box", background: "white" }} />
                 </div>
-                {[
-                  ["Authors *", "authors", "Comma separated: A. Author, B. Author, NK Allam"],
-                  ["Journal / Venue *", "venue", "e.g. ACS Applied Materials & Interfaces"],
-                  ["Year *", "year", "e.g. 2026"],
-                  ["DOI (optional)", "doi", "e.g. 10.1021/..."],
-                ].map(([label, key, placeholder]) => (
+                {[["Authors *", "authors", "A. Author, B. Author, NK Allam"], ["Journal / Venue *", "venue", "e.g. ACS Applied Materials"], ["Year *", "year", "e.g. 2026"], ["DOI (optional)", "doi", "e.g. 10.1021/..."]].map(([label, key, ph]) => (
                   <div key={key}>
                     <label style={{ fontSize: 11, color: "#4a6080", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>{label}</label>
-                    <input value={pubForm[key]} onChange={e => setPubForm(f => ({ ...f, [key]: e.target.value }))}
-                      placeholder={placeholder}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1px solid #d0d8e8", fontFamily: "Outfit, sans-serif", outline: "none", borderRadius: 2, boxSizing: "border-box", background: "white" }} />
+                    <input value={pubForm[key]} onChange={e => setPubForm(f => ({ ...f, [key]: e.target.value }))} placeholder={ph} style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1px solid #d0d8e8", fontFamily: "Outfit, sans-serif", outline: "none", borderRadius: 2, boxSizing: "border-box", background: "white" }} />
                   </div>
                 ))}
               </div>
@@ -1114,10 +958,129 @@ function PublicationsSection() {
   );
 }
 
+// ── PATENTS SECTION ────────────────────────────────────────────────────────
+function PatentsSection({ editOn }) {
+  const [patents, setPatents] = useState(() => {
+    try {
+      const stored = localStorage.getItem("eml_patents");
+      return stored ? JSON.parse(stored) : DEFAULT_PATENTS;
+    } catch { return DEFAULT_PATENTS; }
+  });
+  const [addOpen, setAddOpen] = useState(false);
+  const [form, setForm] = useState({ number: "", title: "", inventors: "", assignee: "The American University in Cairo", filed: new Date().getFullYear().toString(), status: "Provisional", url: "" });
+
+  const savePatents = (list) => {
+    setPatents(list);
+    try { localStorage.setItem("eml_patents", JSON.stringify(list)); } catch {}
+  };
+
+  const addPatent = () => {
+    if (!form.title.trim()) return;
+    savePatents([form, ...patents]);
+    setForm({ number: "", title: "", inventors: "", assignee: "The American University in Cairo", filed: new Date().getFullYear().toString(), status: "Provisional", url: "" });
+    setAddOpen(false);
+  };
+
+  const removePatent = (i) => savePatents(patents.filter((_, idx) => idx !== i));
+
+  return (
+    <section id="patents" style={{ background: "#f4f6fa" }}>
+      <div className="section">
+        <div className="fade">
+          <p className="section-label mono">Intellectual Property</p>
+          <h2 className="section-title serif">Patents &amp; Inventions</h2>
+        </div>
+
+        {/* Status bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#dde8f5", color: "#1e4080", padding: "4px 12px", borderRadius: 20, fontSize: 11, fontFamily: "Space Mono", fontWeight: 700, letterSpacing: "0.08em" }}>
+            📋 {patents.length} PATENTS
+          </div>
+          <a href={SCHOLAR_PATENTS_URL} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: "#1e4080", fontFamily: "Space Mono", textDecoration: "none", marginLeft: "auto" }}>
+            Search Google Patents ↗
+          </a>
+        </div>
+
+        {/* Patent list */}
+        <div className="fade" style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          {patents.map((p, i) => (
+            <div key={i} style={{ padding: "22px 28px", background: "white", border: "1px solid #d0d8e8", borderTop: i === 0 ? "1px solid #d0d8e8" : "none", display: "flex", gap: 20, alignItems: "flex-start", transition: "all 0.2s", cursor: "default", position: "relative" }}
+              onMouseOver={e => { e.currentTarget.style.background="#f0f4ff"; e.currentTarget.style.borderLeft="3px solid #1e4080"; e.currentTarget.style.paddingLeft="25px"; }}
+              onMouseOut={e => { e.currentTarget.style.background="white"; e.currentTarget.style.borderLeft=""; e.currentTarget.style.paddingLeft="28px"; }}>
+              <div style={{ flexShrink: 0, width: 40, height: 40, background: "#edf0f7", border: "1px solid #d0d8e8", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 2, marginTop: 2 }}>
+                <span style={{ fontSize: 20 }}>📋</span>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 7, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 10, fontFamily: "Space Mono", fontWeight: 700, letterSpacing: "0.08em", padding: "2px 9px", borderRadius: 20, background: p.status === "Granted" ? "#d4f0e4" : p.status === "Pending" ? "#fef3d7" : "#dde8f5", color: p.status === "Granted" ? "#1a6a3a" : p.status === "Pending" ? "#7a5000" : "#1e4080" }}>{p.status.toUpperCase()}</span>
+                  <span style={{ fontSize: 10, fontFamily: "Space Mono", color: "#8a9ab0" }}>{p.number}</span>
+                  <span style={{ fontSize: 10, fontFamily: "Space Mono", color: "#f0b429" }}>Filed {p.filed}</span>
+                </div>
+                <p style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 15, color: "#0a162e", lineHeight: 1.4, marginBottom: 7 }}>
+                  {p.url ? <a href={p.url} target="_blank" rel="noreferrer" style={{ color: "inherit", textDecoration: "none" }} onMouseOver={e => e.target.style.color="#1e4080"} onMouseOut={e => e.target.style.color="inherit"}>{p.title}</a> : p.title}
+                </p>
+                <p style={{ fontSize: 12, color: "#4a6080", marginBottom: 3 }}><span style={{ color: "#1e4080", fontWeight: 600 }}>Inventors: </span>{p.inventors}</p>
+                <p style={{ fontSize: 11, color: "#8a9ab0", fontFamily: "Space Mono" }}>{p.assignee}</p>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0, alignItems: "flex-end" }}>
+                {p.url && <a href={p.url} target="_blank" rel="noreferrer" style={{ fontSize: 10, fontFamily: "Space Mono", color: "#1e4080", border: "1px solid #d0d8e8", padding: "4px 10px", textDecoration: "none", whiteSpace: "nowrap" }} onMouseOver={e => { e.currentTarget.style.background="#1e4080"; e.currentTarget.style.color="white"; }} onMouseOut={e => { e.currentTarget.style.background=""; e.currentTarget.style.color="#1e4080"; }}>View ↗</a>}
+                {editOn && <button onClick={() => removePatent(i)} style={{ fontSize: 9, color: "#e05555", background: "none", border: "1px solid #e05555", cursor: "pointer", padding: "3px 8px", fontFamily: "Space Mono" }}>✕ Remove</button>}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Add Patent button */}
+        <div style={{ marginTop: 16 }}>
+          {editOn && !addOpen && (
+            <button onClick={() => setAddOpen(true)} style={{ width: "100%", padding: "12px", border: "2px dashed rgba(30,64,128,0.4)", background: "rgba(30,64,128,0.03)", color: "#1e4080", fontFamily: "Space Mono", fontSize: 11, letterSpacing: "0.12em", cursor: "pointer", textTransform: "uppercase", borderRadius: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 12 }}>＋ Add New Patent</button>
+          )}
+          {editOn && addOpen && (
+            <div style={{ border: "1px solid #1e4080", background: "#f0f4ff", padding: "20px 24px", borderRadius: 2, marginBottom: 12 }}>
+              <p style={{ fontSize: 12, fontFamily: "Space Mono", color: "#1e4080", letterSpacing: "0.1em", marginBottom: 16, textTransform: "uppercase", fontWeight: 700 }}>＋ Add Patent</p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px", marginBottom: 14 }}>
+                {[
+                  ["Title *", "title", "Full patent title", true],
+                  ["Patent Number", "number", "e.g. US11795521B2", false],
+                  ["Inventors *", "inventors", "A. Name, B. Name, NK Allam", false],
+                  ["Assignee", "assignee", "The American University in Cairo", false],
+                  ["Filed Year", "filed", "e.g. 2024", false],
+                  ["Google Patents URL", "url", "https://patents.google.com/patent/...", false],
+                ].map(([label, key, ph, full]) => (
+                  <div key={key} style={full ? { gridColumn: "1 / -1" } : {}}>
+                    <label style={{ fontSize: 11, color: "#4a6080", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>{label}</label>
+                    <input value={form[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} placeholder={ph} style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1px solid #d0d8e8", fontFamily: "Outfit, sans-serif", outline: "none", borderRadius: 2, boxSizing: "border-box", background: "white" }} />
+                  </div>
+                ))}
+                <div>
+                  <label style={{ fontSize: 11, color: "#4a6080", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>Status</label>
+                  <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))} style={{ width: "100%", padding: "7px 10px", fontSize: 13, border: "1px solid #d0d8e8", fontFamily: "Outfit, sans-serif", outline: "none", borderRadius: 2, background: "white" }}>
+                    <option>Provisional</option>
+                    <option>Pending</option>
+                    <option>Granted</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={addPatent} style={{ padding: "8px 20px", background: "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 11, cursor: "pointer", borderRadius: 2 }}>Add Patent</button>
+                <button onClick={() => setAddOpen(false)} style={{ padding: "8px 16px", background: "transparent", border: "1px solid #d0d8e8", color: "#8a9ab0", fontFamily: "Space Mono", fontSize: 11, cursor: "pointer", borderRadius: 2 }}>Cancel</button>
+              </div>
+            </div>
+          )}
+          <a href={SCHOLAR_PATENTS_URL} target="_blank" rel="noreferrer" style={{ fontSize: 12, fontFamily: "Space Mono", color: "#8a9ab0", textDecoration: "none" }}>
+            Search all patents on Google Patents →
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
 
 
 // ── EDIT CONTEXT — shared state across all components ─────────────────────
-const EditContext = React.createContext({ editOn: false });
+const EditContext = React.createContext({ editOn: false, openCropForMember: null, setMemberOverrides: null });
 
 const ADMIN_HASH = "da25c5b5903cfd4b93885fe8a67aed43e871cc8b5cad8eb95988e49cb16da8d9";
 
@@ -1622,6 +1585,65 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
             )}
           </div>
 
+          {activeTab === "save" && (
+            <div style={{ padding: "0 18px 18px" }}>
+              <p style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", letterSpacing: "0.12em", marginBottom: 16, textTransform: "uppercase" }}>Save to GitHub</p>
+              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(240,180,41,0.2)", padding: "14px 16px", borderRadius: 2, marginBottom: 16 }}>
+                <p style={{ fontSize: 10, color: "#f0b429", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>GitHub Settings</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div>
+                    <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>Repository</label>
+                    <input value={ghRepo} onChange={e => setGhRepo(e.target.value)} placeholder="username/repo-name"
+                      style={{ width: "100%", padding: "7px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontFamily: "Space Mono", fontSize: 11, outline: "none", borderRadius: 2, boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>
+                      Personal Access Token
+                      <a href="https://github.com/settings/tokens/new?scopes=repo&description=EML+Admin" target="_blank" rel="noreferrer"
+                        style={{ color: "#f0b429", marginLeft: 8, textDecoration: "none", fontSize: 9 }}>Generate ↗</a>
+                    </label>
+                    <input type="password" value={ghToken} onChange={e => setGhToken(e.target.value)} placeholder="ghp_xxxxxxxxxxxx"
+                      style={{ width: "100%", padding: "7px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontFamily: "Space Mono", fontSize: 11, outline: "none", borderRadius: 2, boxSizing: "border-box" }} />
+                    <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 4 }}>Stored in your browser only. Needs "repo" scope.</p>
+                  </div>
+                  <button onClick={() => { localStorage.setItem("eml_gh_token", ghToken); localStorage.setItem("eml_gh_repo", ghRepo); setSaveMsg("✓ Settings saved"); setTimeout(() => setSaveMsg(""), 3000); }}
+                    style={{ padding: "7px 14px", background: "rgba(240,180,41,0.1)", border: "1px solid rgba(240,180,41,0.4)", color: "#f0b429", fontFamily: "Space Mono", fontSize: 10, cursor: "pointer", borderRadius: 2 }}>
+                    Save Settings
+                  </button>
+                </div>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", padding: "12px 14px", borderRadius: 2, marginBottom: 16 }}>
+                <p style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 10, textTransform: "uppercase" }}>What Gets Saved</p>
+                {[
+                  ["📸", "Member photos", `${Object.keys(memberOverrides).length} photo override(s)`],
+                  ["📋", "Patents", "All patents incl. newly added"],
+                  ["📁", "Projects", `${extraProjects.length} extra project(s)`],
+                  ["📝", "Text edits", "Any text edited on the page"],
+                ].map(([icon, label, desc]) => (
+                  <div key={label} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8 }}>
+                    <span style={{ fontSize: 14, flexShrink: 0 }}>{icon}</span>
+                    <div>
+                      <p style={{ fontSize: 11, color: "white", fontFamily: "Space Mono", margin: 0 }}>{label}</p>
+                      <p style={{ fontSize: 10, color: "#8a9ab0", margin: 0 }}>{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={saveToGitHub} disabled={saving}
+                style={{ width: "100%", padding: "14px", background: saving ? "#333" : "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", cursor: saving ? "not-allowed" : "pointer", borderRadius: 2, textTransform: "uppercase", marginBottom: 10 }}>
+                {saving ? "⏳ Saving…" : "💾 Save & Publish to GitHub"}
+              </button>
+              {saveMsg && (
+                <p style={{ fontSize: 11, fontFamily: "Space Mono", color: saveMsg.startsWith("✓") ? "#1a9e75" : "#e05555", textAlign: "center", padding: "8px", background: saveMsg.startsWith("✓") ? "rgba(26,158,117,0.1)" : "rgba(224,85,85,0.1)", borderRadius: 2 }}>
+                  {saveMsg}
+                </p>
+              )}
+              <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 12, lineHeight: 1.6 }}>
+                Commits an overrides file to GitHub. The site rebuilds automatically in ~2 min.
+              </p>
+            </div>
+          )}
+
           {/* Footer */}
           <div style={{ padding: "10px 16px", borderTop: "1px solid rgba(255,255,255,0.06)", background: "#060f1e", flexShrink: 0 }}>
             <button onClick={() => { setLoggedIn(false); setShowPanel(false); disableEdit(); setMemberOverrides({}); }}
@@ -1651,7 +1673,6 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
 
 
 export default function EMLWebsite() {
-  const [equipFilter, setEquipFilter] = useState("all");
   const [editOn, setEditOn] = useState(false);
   const [extraMembers, setExtraMembers] = useState({});
   const [extraProjects, setExtraProjects] = useState([]);
@@ -1659,13 +1680,23 @@ export default function EMLWebsite() {
   const [inlineCrop, setInlineCrop] = useState(null); // { src, name, onSave }
   useIntersect();
 
+  // Load saved overrides from GitHub on first visit
+  useEffect(() => {
+    fetch(`${import.meta.env.BASE_URL}eml-overrides.json?v=${Date.now()}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        if (data.memberOverrides && Object.keys(data.memberOverrides).length)
+          setMemberOverrides(prev => ({ ...prev, ...data.memberOverrides }));
+        if (data.patents)
+          try { localStorage.setItem('eml_patents', JSON.stringify(data.patents)); } catch {}
+      })
+      .catch(() => {});
+  }, []);
+
   const openCropForMember = (name, currentSrc, onSave) => {
     setInlineCrop({ src: currentSrc, name, onSave });
   };
-
-  const filteredEquip = devices.filter(d =>
-    equipFilter === "all" ? true : d.status === equipFilter
-  );
 
   const addMember = (groupLabel, member) => {
     setExtraMembers(prev => ({
@@ -1676,7 +1707,7 @@ export default function EMLWebsite() {
 
 
   return (
-    <EditContext.Provider value={{ editOn }}>
+    <EditContext.Provider value={{ editOn, openCropForMember, setMemberOverrides }}>
     <div style={{ fontFamily: "'Outfit', sans-serif", background: "#f4f6fa" }}>
       <style>{CSS}</style>
 
@@ -1688,7 +1719,7 @@ export default function EMLWebsite() {
           <AUCLogo />
         </div>
         <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-          {["Research", "Publications", "Patents", "Team", "Projects", "Equipment", "Contact"].map(s => (
+          {["Research", "Publications", "Patents", "Team", "Projects", "Contact"].map(s => (
             <a key={s} href={`#${s.toLowerCase()}`} style={{
               color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 500,
               letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none",
@@ -1890,76 +1921,8 @@ export default function EMLWebsite() {
 
 
       {/* PATENTS */}
-      <section id="patents" style={{ background: "#f4f6fa" }}>
-        <div className="section">
-          <div className="fade">
-            <p className="section-label mono">Intellectual Property</p>
-            <h2 className="section-title serif">Patents &amp; Inventions</h2>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 0 }} className="fade">
-            {[
-              { number: "US11795521B2", title: "Extraction of Iron (III) Oxide from Different Iron-Containing Ores", inventors: "Nageh K. Allam, Mahmoud M. Aly", assignee: "The American University in Cairo", filed: "2018", status: "Granted", url: "https://patents.google.com/patent/US11795521B2/en" },
-              { number: "US App.", title: "Hydrogel Electrolyte Composition for Energy Storage Devices with Anti-Freeze and Non-Flammable Properties", inventors: "Nageh K. Allam, Abdelrahman A. M. Ismail", assignee: "The American University in Cairo", filed: "2023", status: "Pending", url: "" },
-              { number: "US Prov. 62/262743", title: "Sub 100 nm Oxidized Transition Metal Tubular Architectures", inventors: "Menna Samir, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2016", status: "Provisional", url: "" },
-              { number: "US Prov. 62/262685", title: "Ti-based Functional Nanoarchitectures as Drug Eluting Stents", inventors: "Yomna E. Saleh, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2016", status: "Provisional", url: "" },
-              { number: "US Prov. 61/985504", title: "Efficient Charge Separation in Self-Assembled Nanostructured Photoanodes with Staggered Bandgap for Solar Energy Conversion", inventors: "R. Nashed, P. Szymanski, M. A. El-Sayed, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2014", status: "Provisional", url: "" },
-              { number: "US Prov. 62/457533", title: "Magnetolysis — Electrochemical Water Splitting Using Magnetic Fields", inventors: "Hady Soliman, Mohamed Shokeir, Sandy El Moghazi, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2017", status: "Provisional", url: "" },
-              { number: "US Prov. 62/509432", title: "Extraction of Iron (III) Oxide From Different Iron-Containing Ores", inventors: "Mahmoud A. Aly, Nageh K. Allam", assignee: "The American University in Cairo", filed: "2017", status: "Provisional", url: "" },
-            ].map((p, i) => (
-              <div key={i} style={{
-                padding: "22px 28px", background: "white",
-                border: "1px solid #d0d8e8", borderTop: i === 0 ? "1px solid #d0d8e8" : "none",
-                display: "flex", gap: 20, alignItems: "flex-start",
-                transition: "all 0.2s", cursor: "default",
-              }}
-              onMouseOver={e => { e.currentTarget.style.background="#f0f4ff"; e.currentTarget.style.borderLeft="3px solid #1e4080"; e.currentTarget.style.paddingLeft="25px"; }}
-              onMouseOut={e => { e.currentTarget.style.background="white"; e.currentTarget.style.borderLeft=""; e.currentTarget.style.paddingLeft="28px"; }}
-              >
-                <div style={{ flexShrink: 0, width: 40, height: 40, background: "#edf0f7", border: "1px solid #d0d8e8", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 2, marginTop: 2 }}>
-                  <span style={{ fontSize: 20 }}>📋</span>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 7, flexWrap: "wrap" }}>
-                    <span style={{
-                      fontSize: 10, fontFamily: "Space Mono", fontWeight: 700, letterSpacing: "0.08em",
-                      padding: "2px 9px", borderRadius: 20,
-                      background: p.status === "Granted" ? "#d4f0e4" : p.status === "Pending" ? "#fef3d7" : "#dde8f5",
-                      color: p.status === "Granted" ? "#1a6a3a" : p.status === "Pending" ? "#7a5000" : "#1e4080",
-                    }}>{p.status.toUpperCase()}</span>
-                    <span style={{ fontSize: 10, fontFamily: "Space Mono", color: "#8a9ab0" }}>{p.number}</span>
-                    <span style={{ fontSize: 10, fontFamily: "Space Mono", color: "#f0b429" }}>Filed {p.filed}</span>
-                  </div>
-                  <p style={{ fontFamily: "'Libre Baskerville', serif", fontSize: 15, color: "#0a162e", lineHeight: 1.4, marginBottom: 7 }}>
-                    {p.url
-                      ? <a href={p.url} target="_blank" rel="noreferrer" style={{ color: "inherit", textDecoration: "none" }} onMouseOver={e => e.target.style.color="#1e4080"} onMouseOut={e => e.target.style.color="inherit"}>{p.title}</a>
-                      : p.title}
-                  </p>
-                  <p style={{ fontSize: 12, color: "#4a6080", marginBottom: 3 }}>
-                    <span style={{ color: "#1e4080", fontWeight: 600 }}>Inventors: </span>{p.inventors}
-                  </p>
-                  <p style={{ fontSize: 11, color: "#8a9ab0", fontFamily: "Space Mono" }}>{p.assignee}</p>
-                </div>
-                {p.url && (
-                  <a href={p.url} target="_blank" rel="noreferrer" style={{
-                    flexShrink: 0, alignSelf: "flex-start", fontSize: 10, fontFamily: "Space Mono",
-                    color: "#1e4080", border: "1px solid #d0d8e8", padding: "4px 10px",
-                    textDecoration: "none", transition: "all 0.15s", whiteSpace: "nowrap",
-                  }}
-                  onMouseOver={e => { e.currentTarget.style.background="#1e4080"; e.currentTarget.style.color="white"; }}
-                  onMouseOut={e => { e.currentTarget.style.background=""; e.currentTarget.style.color="#1e4080"; }}
-                  >View ↗</a>
-                )}
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <a href="https://patents.google.com/?inventor=Nageh+Allam&assignee=American+University+in+Cairo" target="_blank" rel="noreferrer"
-              style={{ fontSize: 12, fontFamily: "Space Mono", color: "#8a9ab0", textDecoration: "none" }}>
-              Search all patents on Google Patents →
-            </a>
-          </div>
-        </div>
-      </section>
+      <PatentsSection editOn={editOn} />
+
 
       {/* TEAM */}
       <div className="section-alt">
@@ -2019,67 +1982,38 @@ export default function EMLWebsite() {
                   {allMembers.map((m, i) => (
                     <div key={i} className="member-card fade" style={{ transitionDelay: `${i * 0.04}s` }}>
                       {/* LEFT HALF — full photo, clickable in edit mode */}
-                      {(m.photo || memberOverrides[m.name]) ? (
-                        <div style={{ position: "relative", width: 160, height: 200, flexShrink: 0 }}>
-                          <img
-                            src={memberOverrides[m.name] || (m._isDataUrl ? m.photo : `${import.meta.env.BASE_URL}${m.photo}`)}
-                            alt={m.name}
-                            className="member-photo-half"
-                            style={{ objectPosition: "center top", cursor: editOn ? "pointer" : "default" }}
-                            onClick={() => {
-                              if (!editOn) return;
-                              const src = memberOverrides[m.name] || (m._isDataUrl ? m.photo : `${import.meta.env.BASE_URL}${m.photo}`);
-                              openCropForMember(m.name, src, d => setMemberOverrides(p => ({ ...p, [m.name]: d })));
-                            }}
-                            onError={e => {
-                              e.target.style.display = "none";
-                              e.target.parentNode.querySelector(".member-photo-fallback").style.display = "flex";
-                            }}
-                          />
-                          {editOn && (
-                            <div style={{
-                              position: "absolute", inset: 0, background: "rgba(10,22,46,0.55)",
-                              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                              gap: 6, opacity: 0, transition: "opacity 0.2s", cursor: "pointer",
-                            }}
-                            onMouseOver={e => e.currentTarget.style.opacity = 1}
-                            onMouseOut={e => e.currentTarget.style.opacity = 0}
-                            onClick={() => {
-                              const src = memberOverrides[m.name] || (m._isDataUrl ? m.photo : `${import.meta.env.BASE_URL}${m.photo}`);
-                              openCropForMember(m.name, src, d => setMemberOverrides(p => ({ ...p, [m.name]: d })));
-                            }}>
-                              <span style={{ fontSize: 22 }}>✂</span>
-                              <span style={{ fontSize: 9, color: "white", fontFamily: "Space Mono", letterSpacing: "0.1em", textAlign: "center" }}>CLICK TO EDIT PHOTOEDIT PHOTO</span>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div style={{ position: "relative", width: 160, height: 200, flexShrink: 0 }}>
-                          <div
-                            className="member-photo-fallback"
-                            style={{ background: m.bg, color: m.color, display: "flex", cursor: editOn ? "pointer" : "default" }}
-                            onClick={() => {
-                              if (!editOn) return;
-                              // open with blank — user uploads new
-                              setInlineCrop({ src: null, name: m.name, onSave: d => setMemberOverrides(p => ({ ...p, [m.name]: d }) )});
-                            }}
-                          >{m.initials}</div>
-                          {editOn && (
-                            <div style={{
-                              position: "absolute", inset: 0, background: "rgba(10,22,46,0.55)",
-                              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                              gap: 6, opacity: 0, transition: "opacity 0.2s", cursor: "pointer",
-                            }}
-                            onMouseOver={e => e.currentTarget.style.opacity = 1}
-                            onMouseOut={e => e.currentTarget.style.opacity = 0}
-                            onClick={() => setInlineCrop({ src: null, name: m.name, onSave: d => setMemberOverrides(p => ({ ...p, [m.name]: d })) })}>
-                              <span style={{ fontSize: 22 }}>📁</span>
-                              <span style={{ fontSize: 9, color: "white", fontFamily: "Space Mono", letterSpacing: "0.1em" }}>UPLOAD PHOTO</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <div className="member-photo-fallback" style={{ display: "none" }}>{m.initials}</div>
+                      {(() => {
+                        const photoSrc = memberOverrides[m.name] || (m.photo ? (m._isDataUrl ? m.photo : `${import.meta.env.BASE_URL}${m.photo}`) : null);
+                        const doEdit = () => {
+                          if (photoSrc) {
+                            openCropForMember(m.name, photoSrc, d => setMemberOverrides(p => ({ ...p, [m.name]: d })));
+                          } else {
+                            setInlineCrop({ src: null, name: m.name, onSave: d => setMemberOverrides(p => ({ ...p, [m.name]: d })) });
+                          }
+                        };
+                        return (
+                          <div style={{ position: "relative", width: 160, height: 200, flexShrink: 0, overflow: "hidden", cursor: editOn ? "pointer" : "default" }}
+                            onClick={editOn ? doEdit : undefined}
+                            onMouseEnter={e => { if (editOn) e.currentTarget.querySelector(".edit-overlay").style.opacity = 1; }}
+                            onMouseLeave={e => { if (editOn) e.currentTarget.querySelector(".edit-overlay").style.opacity = 0; }}
+                          >
+                            {photoSrc
+                              ? <img src={photoSrc} alt={m.name} className="member-photo-half" style={{ objectPosition: "center top", pointerEvents: "none" }} onError={e => e.target.style.display = "none"} />
+                              : <div className="member-photo-fallback" style={{ background: m.bg, color: m.color, display: "flex", pointerEvents: "none" }}>{m.initials}</div>
+                            }
+                            {editOn && (
+                              <div className="edit-overlay" style={{
+                                position: "absolute", inset: 0, background: "rgba(10,22,46,0.6)",
+                                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                                gap: 8, opacity: 0, transition: "opacity 0.2s", pointerEvents: "none",
+                              }}>
+                                <span style={{ fontSize: 26 }}>{photoSrc ? "✂" : "📁"}</span>
+                                <span style={{ fontSize: 9, color: "white", fontFamily: "Space Mono", letterSpacing: "0.1em" }}>{photoSrc ? "EDIT PHOTO" : "UPLOAD PHOTO"}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                       {/* RIGHT HALF — text */}
                       <div className="member-text-half">
                         <p className="member-name">{m.name}</p>
@@ -2154,51 +2088,7 @@ export default function EMLWebsite() {
         </div>
       </section>
 
-      {/* EQUIPMENT */}
-      <section id="equipment" style={{ background: "#f4f6fa" }}>
-        <div className="section">
-          <div className="fade">
-            <p className="section-label mono">Lab Infrastructure</p>
-            <h2 className="section-title serif">Equipment &amp; Facilities</h2>
-          </div>
-          <div className="search-bar fade">
-            <button
-              className={`filter-btn ${equipFilter === "all" ? "active" : ""}`}
-              onClick={() => setEquipFilter("all")}
-            >All ({devices.length})</button>
-            <button
-              className={`filter-btn ${equipFilter === "available" ? "active" : ""}`}
-              onClick={() => setEquipFilter("available")}
-            >Available ({devices.filter(d => d.status === "available").length})</button>
-            <button
-              className={`filter-btn ${equipFilter === "under" ? "active" : ""}`}
-              onClick={() => setEquipFilter("under")}
-            >Under Maintenance ({devices.filter(d => d.status === "under").length})</button>
-          </div>
-          <div className="equip-grid fade" style={{ transitionDelay: "0.1s" }}>
-            {filteredEquip.map((d, i) => (
-              <div key={i} className="equip-card">
-                {d.img && (
-                  <img
-                    src={d.img}
-                    alt={d.name}
-                    style={{ width: "100%", height: 120, objectFit: "cover", marginBottom: 10, borderRadius: 2, display: "block" }}
-                    onError={e => { e.target.style.display = "none"; }}
-                  />
-                )}
-                <div className="equip-name">{d.name}</div>
-                <div className="equip-loc mono">{d.loc}</div>
-                <span className={`equip-status ${d.status === "available" ? "status-available" : "status-under"}`}>
-                  {d.status === "available" ? "Available" : "Under Maintenance"}
-                </span>
-              </div>
-            ))}
-          </div>
-          <p className="fade" style={{ marginTop: 20, fontSize: 12, color: "#8a9ab0", fontFamily: "Space Mono", transitionDelay: "0.2s" }}>
-            Facilities spread across Wet Chemistry Lab, Testing Lab 1, and Testing Lab 2 · 67 instruments total
-          </p>
-        </div>
-      </section>
+
 
       {/* FOOTER */}
       <footer className="footer" id="contact">
@@ -2223,7 +2113,7 @@ export default function EMLWebsite() {
           </div>
           <div>
             <p className="footer-heading">Navigate</p>
-            {["Research", "Publications", "Patents", "Team", "Projects", "Equipment"].map(l => (
+            {["Research", "Publications", "Patents", "Team", "Projects"].map(l => (
               <a key={l} href={`#${l.toLowerCase()}`} className="footer-link">{l}</a>
             ))}
           </div>
