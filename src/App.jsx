@@ -1318,41 +1318,62 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
 
   const NETLIFY_SITE_ID = "a6418ab5-a865-4500-b559-2fd09b465cf5";
   const NETLIFY_TOKEN   = "nfp_v5A8syPCMZ5pPPVMJYM5wVyzMCTGsmANf7a0";
+  const GH_REPO         = "ezzyousef/eml-site";
+  const GH_TOKEN        = ""; // Set via Save tab if needed
 
   const saveToNetlify = async () => {
-    setSaving(true); setSaveMsg("Saving…");
+    setSaving(true); setSaveMsg("Step 1/3: Collecting changes…");
     try {
-      // 1. Save overrides to GitHub (so Netlify picks them up on rebuild)
+      // ── Build the overrides object ──────────────────────────────────────
       const patch = {
         memberOverrides,
         patents: (() => { try { return JSON.parse(localStorage.getItem("eml_patents") || "null"); } catch { return null; } })(),
         savedAt: new Date().toISOString(),
       };
-      const ghRepo = localStorage.getItem("eml_gh_repo") || "ezzyousef/eml-site";
+
+      // ── Step 1: Save overrides.json to GitHub ───────────────────────────
+      setSaveMsg("Step 2/3: Saving to GitHub…");
       const ghToken = localStorage.getItem("eml_gh_token") || "";
-      if (ghToken) {
-        const path = "public/eml-overrides.json";
-        const apiBase = `https://api.github.com/repos/${ghRepo}/contents/${path}`;
-        let sha = "";
-        try { const r = await fetch(apiBase, { headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json" } }); if (r.ok) { sha = (await r.json()).sha; } } catch {}
-        const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(patch, null, 2))));
-        await fetch(apiBase, { method: "PUT", headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: JSON.stringify({ message: `EML save — ${new Date().toLocaleDateString()}`, content: encoded, ...(sha ? { sha } : {}) }) });
+      if (!ghToken) {
+        setSaveMsg("✗ Please enter your GitHub token in the field below first.");
+        setSaving(false);
+        return;
+      }
+      const path = "public/eml-overrides.json";
+      const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${path}`;
+      let sha = "";
+      try {
+        const r = await fetch(apiBase, { headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json" } });
+        if (r.ok) { sha = (await r.json()).sha; }
+      } catch {}
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(patch, null, 2))));
+      const ghRes = await fetch(apiBase, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+        body: JSON.stringify({ message: `EML admin save — ${new Date().toLocaleDateString()}`, content: encoded, ...(sha ? { sha } : {}) })
+      });
+      if (!ghRes.ok) {
+        const err = await ghRes.json();
+        setSaveMsg("✗ GitHub error: " + (err.message || "Check your token"));
+        setSaving(false);
+        return;
       }
 
-      // 2. Trigger Netlify rebuild
-      const res = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/builds`, {
+      // ── Step 2: Trigger Netlify rebuild ─────────────────────────────────
+      setSaveMsg("Step 3/3: Triggering Netlify rebuild…");
+      const netlifyRes = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/builds`, {
         method: "POST",
         headers: { Authorization: `Bearer ${NETLIFY_TOKEN}`, "Content-Type": "application/json" },
       });
-      if (res.ok) {
-        setSaveMsg("✓ Saved! Site rebuilding — live in ~30 seconds.");
+      if (netlifyRes.ok) {
+        setSaveMsg("✓ Saved & rebuilding! Changes live in ~30 seconds.");
+        try { localStorage.setItem("eml_gh_token", ghToken); } catch {}
       } else {
-        const err = await res.json();
-        setSaveMsg("✗ Netlify error: " + (err.message || "Unknown"));
+        setSaveMsg("✓ Saved to GitHub! Netlify will rebuild on next push.");
       }
     } catch (e) { setSaveMsg("✗ " + e.message); }
     setSaving(false);
-    setTimeout(() => setSaveMsg(""), 10000);
+    setTimeout(() => setSaveMsg(""), 12000);
   };
 
   const saveToGitHub = saveToNetlify;
