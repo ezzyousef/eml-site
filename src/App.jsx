@@ -1324,6 +1324,8 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
         token: pwArg,
         memberOverrides,
         patents: (() => { try { return JSON.parse(localStorage.getItem("eml_patents") || "null"); } catch { return null; } })(),
+        extraProjects,
+        extraMembers,
       };
       const res = await fetch("/api/save-overrides", {
         method: "POST",
@@ -1708,10 +1710,18 @@ export default function EMLWebsite() {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return;
+        // Restore photo overrides
         if (data.memberOverrides && Object.keys(data.memberOverrides).length)
           setMemberOverrides(prev => ({ ...prev, ...data.memberOverrides }));
+        // Restore patents to localStorage so PatentsSection picks them up
         if (data.patents)
           try { localStorage.setItem("eml_patents", JSON.stringify(data.patents)); } catch {}
+        // Restore extra projects
+        if (data.extraProjects && data.extraProjects.length)
+          setExtraProjects(data.extraProjects);
+        // Restore extra members
+        if (data.extraMembers)
+          setExtraMembers(data.extraMembers);
       })
       .catch(() => {});
   }, []);
