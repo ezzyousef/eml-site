@@ -1316,64 +1316,28 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
 
-  const NETLIFY_SITE_ID = "a6418ab5-a865-4500-b559-2fd09b465cf5";
-  const NETLIFY_TOKEN   = "nfp_v5A8syPCMZ5pPPVMJYM5wVyzMCTGsmANf7a0";
-  const GH_REPO         = "ezzyousef/eml-site";
-  const GH_TOKEN        = ""; // Set via Save tab if needed
-
-  const saveToNetlify = async () => {
-    setSaving(true); setSaveMsg("Step 1/3: Collecting changes…");
+  const saveToNetlify = async (adminPw) => {
+    setSaving(true); setSaveMsg("Saving…");
     try {
-      // ── Build the overrides object ──────────────────────────────────────
       const patch = {
+        token: adminPw,
         memberOverrides,
         patents: (() => { try { return JSON.parse(localStorage.getItem("eml_patents") || "null"); } catch { return null; } })(),
-        savedAt: new Date().toISOString(),
       };
-
-      // ── Step 1: Save overrides.json to GitHub ───────────────────────────
-      setSaveMsg("Step 2/3: Saving to GitHub…");
-      const ghToken = localStorage.getItem("eml_gh_token") || "";
-      if (!ghToken) {
-        setSaveMsg("✗ Please enter your GitHub token in the field below first.");
-        setSaving(false);
-        return;
-      }
-      const path = "public/eml-overrides.json";
-      const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${path}`;
-      let sha = "";
-      try {
-        const r = await fetch(apiBase, { headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json" } });
-        if (r.ok) { sha = (await r.json()).sha; }
-      } catch {}
-      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(patch, null, 2))));
-      const ghRes = await fetch(apiBase, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${ghToken}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
-        body: JSON.stringify({ message: `EML admin save — ${new Date().toLocaleDateString()}`, content: encoded, ...(sha ? { sha } : {}) })
-      });
-      if (!ghRes.ok) {
-        const err = await ghRes.json();
-        setSaveMsg("✗ GitHub error: " + (err.message || "Check your token"));
-        setSaving(false);
-        return;
-      }
-
-      // ── Step 2: Trigger Netlify rebuild ─────────────────────────────────
-      setSaveMsg("Step 3/3: Triggering Netlify rebuild…");
-      const netlifyRes = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/builds`, {
+      const res = await fetch("/api/save-overrides", {
         method: "POST",
-        headers: { Authorization: `Bearer ${NETLIFY_TOKEN}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
       });
-      if (netlifyRes.ok) {
-        setSaveMsg("✓ Saved & rebuilding! Changes live in ~30 seconds.");
-        try { localStorage.setItem("eml_gh_token", ghToken); } catch {}
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        setSaveMsg("✓ Saved! Changes are live instantly.");
       } else {
-        setSaveMsg("✓ Saved to GitHub! Netlify will rebuild on next push.");
+        setSaveMsg("✗ Error: " + (json.error || "Unknown"));
       }
     } catch (e) { setSaveMsg("✗ " + e.message); }
     setSaving(false);
-    setTimeout(() => setSaveMsg(""), 12000);
+    setTimeout(() => setSaveMsg(""), 8000);
   };
 
   const saveToGitHub = saveToNetlify;
@@ -1654,26 +1618,13 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
 
           {activeTab === "save" && (
             <div style={{ padding: "0 18px 18px" }}>
-              <p style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", letterSpacing: "0.12em", marginBottom: 16, textTransform: "uppercase" }}>Save & Deploy to Netlify</p>
-
-              {/* GitHub Token Box */}
-              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(240,180,41,0.2)", padding: "14px 16px", borderRadius: 2, marginBottom: 16 }}>
-                <p style={{ fontSize: 10, color: "#f0b429", fontFamily: "Space Mono", letterSpacing: "0.1em", marginBottom: 6, textTransform: "uppercase", fontWeight: 700 }}>GitHub Token Required</p>
-                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 10, lineHeight: 1.6 }}>
-                  Your edits are saved to GitHub, then Netlify rebuilds automatically.
+              {/* Netlify Connected Status */}
+              <div style={{ background: "rgba(26,158,117,0.08)", border: "1px solid rgba(26,158,117,0.3)", padding: "12px 14px", borderRadius: 2, marginBottom: 16 }}>
+                <p style={{ fontSize: 10, color: "#1a9e75", fontFamily: "Space Mono", fontWeight: 700, marginBottom: 4 }}>✓ NETLIFY BLOBS CONNECTED</p>
+                <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
+                  Changes save instantly — no rebuild needed.<br/>
+                  Site: <span style={{ color: "#f0b429" }}>eml-group.netlify.app</span>
                 </p>
-                <label style={{ fontSize: 10, color: "#8a9ab0", fontFamily: "Space Mono", display: "block", marginBottom: 4 }}>
-                  GitHub Personal Access Token
-                  <a href="https://github.com/settings/tokens/new?scopes=repo&description=EML+Admin" target="_blank" rel="noreferrer"
-                    style={{ color: "#f0b429", marginLeft: 8, textDecoration: "none", fontSize: 9 }}>Generate ↗</a>
-                </label>
-                <input type="password" value={ghToken} onChange={e => setGhToken(e.target.value)}
-                  placeholder="ghp_xxxxxxxxxxxx"
-                  style={{ width: "100%", padding: "7px 10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", fontFamily: "Space Mono", fontSize: 11, outline: "none", borderRadius: 2, boxSizing: "border-box", marginBottom: 8 }} />
-                <button onClick={() => { try { localStorage.setItem("eml_gh_token", ghToken); } catch {} setSaveMsg("✓ Token saved!"); setTimeout(() => setSaveMsg(""), 2000); }}
-                  style={{ padding: "7px 14px", background: "rgba(240,180,41,0.1)", border: "1px solid rgba(240,180,41,0.4)", color: "#f0b429", fontFamily: "Space Mono", fontSize: 10, cursor: "pointer", borderRadius: 2 }}>
-                  Save Token
-                </button>
               </div>
 
               {/* What gets saved */}
@@ -1696,7 +1647,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
               </div>
 
               {/* Save button */}
-              <button onClick={saveToGitHub} disabled={saving}
+              <button onClick={() => saveToNetlify(pw || "")} disabled={saving}
                 style={{ width: "100%", padding: "14px", background: saving ? "#333" : "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", cursor: saving ? "not-allowed" : "pointer", borderRadius: 2, textTransform: "uppercase", marginBottom: 10 }}>
                 {saving ? "⏳ Saving…" : "💾 SAVE & PUBLISH TO NETLIFY"}
               </button>
@@ -1749,16 +1700,16 @@ export default function EMLWebsite() {
   const [inlineCrop, setInlineCrop] = useState(null); // { src, name, onSave }
   useIntersect();
 
-  // Load saved overrides from GitHub on first visit
+  // Load saved overrides from Netlify Blobs via API
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}eml-overrides.json?v=${Date.now()}`)
+    fetch("/api/save-overrides")
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return;
         if (data.memberOverrides && Object.keys(data.memberOverrides).length)
           setMemberOverrides(prev => ({ ...prev, ...data.memberOverrides }));
         if (data.patents)
-          try { localStorage.setItem('eml_patents', JSON.stringify(data.patents)); } catch {}
+          try { localStorage.setItem("eml_patents", JSON.stringify(data.patents)); } catch {}
       })
       .catch(() => {});
   }, []);
