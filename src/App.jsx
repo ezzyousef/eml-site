@@ -107,18 +107,33 @@ function getInitials(name) {
   return clean.length >= 2 ? (clean[0][0]+clean[clean.length-1][0]).toUpperCase() : (clean[0]||"?").slice(0,2).toUpperCase();
 }
 
+const LS_KEY = "eml_site_overrides";
+
+function lsLoad() {
+  try { const v = localStorage.getItem(LS_KEY); return v ? JSON.parse(v) : null; } catch { return null; }
+}
+function lsSave(data) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch {}
+}
+
 async function apiLoad() {
   try {
     const r = await fetch("/api/save-overrides");
     const text = await r.text();
-    if (!text) return null;
-    return JSON.parse(text);
-  } catch { return null; }
+    if (!text) return lsLoad();
+    const data = JSON.parse(text);
+    if (data?.siteData) return data;
+    return lsLoad();
+  } catch { return lsLoad(); }
 }
 async function apiSave(password, data) {
-  const r = await fetch("/api/save-overrides", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({token:password,...data}) });
-  const text = await r.text();
-  try { return JSON.parse(text); } catch { return {error:"Invalid response"}; }
+  lsSave(data);
+  try {
+    const r = await fetch("/api/save-overrides", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({token:password,...data}) });
+    if (!r.ok) return {ok:true,local:true};
+    const text = await r.text();
+    try { return JSON.parse(text); } catch { return {ok:true,local:true}; }
+  } catch { return {ok:true,local:true}; }
 }
 async function fetchSemanticPapers() {
   const base = `https://api.semanticscholar.org/graph/v1/author/${AUTHOR_ID}/papers?fields=title,year,authors,venue,externalIds,citationCount,openAccessPdf&limit=200`;
@@ -133,6 +148,45 @@ async function fetchSemanticPapers() {
     } catch { continue; }
   }
   return [];
+}
+
+async function fetchOpenAlexPapers() {
+  try {
+    const mailto = "nageh.allam@aucegypt.edu";
+    const authorRes = await fetch(
+      `https://api.openalex.org/authors?search=Nageh+Allam&mailto=${mailto}`,
+      {headers:{Accept:"application/json"}}
+    );
+    if (!authorRes.ok) return [];
+    const authorData = await authorRes.json();
+    const author = (authorData.results||[]).find(a=>
+      a.display_name.toLowerCase().includes("nageh") &&
+      (a.last_known_institutions||[]).some(i=>(i.display_name||"").toLowerCase().includes("cairo"))
+    ) || authorData.results?.[0];
+    if (!author) return [];
+
+    let allWorks = [], cursor = "*";
+    while (cursor) {
+      const r = await fetch(
+        `https://api.openalex.org/works?filter=author.id:${encodeURIComponent(author.id)}&per_page=200&sort=publication_year:desc&cursor=${cursor}&mailto=${mailto}`,
+        {headers:{Accept:"application/json"}}
+      );
+      if (!r.ok) break;
+      const data = await r.json();
+      allWorks = allWorks.concat(data.results||[]);
+      cursor = data.meta?.next_cursor||null;
+      if ((data.results||[]).length < 200) break;
+    }
+    return allWorks.filter(w=>w.publication_year&&w.title).map(w=>({
+      year: w.publication_year,
+      title: w.title,
+      authors: (w.authorships||[]).map(a=>({name:a.author?.display_name||""})),
+      venue: w.primary_location?.source?.display_name||"",
+      citationCount: w.cited_by_count||0,
+      externalIds: {DOI: w.doi?(w.doi.replace("https://doi.org/","")):""},
+      openAccessPdf: w.open_access?.oa_url?{url:w.open_access.oa_url}:null,
+    }));
+  } catch { return []; }
 }
 
 function readFileAsDataURL(file) {
@@ -501,12 +555,13 @@ function PublicationsSection({extraPapers}) {
 
   useEffect(()=>{
     const today=new Date().toISOString().slice(0,10);
-    const key=`eml_papers_${today}`;
+    const key=`eml_papers_v2_${today}`;
     const cached=sessionStorage.getItem(key);
     if(cached){try{const{merged,ts}=JSON.parse(cached);setPapers(merged);setLastUpdated(new Date(ts));return;}catch{}}
-    fetchSemanticPapers().then(fetched=>{
-      const filtered=fetched.filter(p=>!PAPERS_2026.some(p26=>p.title.toLowerCase().slice(0,40)===p26.title.toLowerCase().slice(0,40)));
-      const merged=[...PAPERS_2026,...filtered];
+    Promise.all([fetchSemanticPapers(),fetchOpenAlexPapers()]).then(([semantic,openalex])=>{
+      const seen=new Set(PAPERS_2026.map(p=>p.title.toLowerCase().trim().slice(0,50)));
+      const dedup=list=>list.filter(p=>{const k=p.title.toLowerCase().trim().slice(0,50);if(seen.has(k))return false;seen.add(k);return true;});
+      const merged=[...PAPERS_2026,...dedup(semantic),...dedup(openalex)].sort((a,b)=>(b.year||0)-(a.year||0));
       const ts=Date.now();
       sessionStorage.setItem(key,JSON.stringify({merged,ts}));
       Object.keys(sessionStorage).filter(k=>k.startsWith("eml_papers_")&&k!==key).forEach(k=>sessionStorage.removeItem(k));
@@ -524,7 +579,7 @@ function PublicationsSection({extraPapers}) {
         <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"#d4f0e4",color:"#1a6a3a",padding:"4px 12px",borderRadius:20,fontSize:11,fontFamily:"Space Mono",fontWeight:700}}>
           <span style={{width:6,height:6,borderRadius:"50%",background:"#1a6a3a",animation:"pulse 2s infinite",display:"inline-block"}} />LIVE · DAILY UPDATE
         </div>
-        <span style={{fontSize:12,color:"#8a9ab0"}}>{papers.length} publications{lastUpdated&&` · Updated ${lastUpdated.toLocaleDateString()}`}</span>
+        <span style={{fontSize:12,color:"#8a9ab0"}}>{papers.length} publications · Semantic Scholar + OpenAlex{lastUpdated&&` · ${lastUpdated.toLocaleDateString()}`}</span>
         <a href={SCHOLAR_URL} target="_blank" rel="noreferrer" style={{fontSize:11,color:"#1e4080",fontFamily:"Space Mono",textDecoration:"none",marginLeft:"auto"}}>Google Scholar ↗</a>
       </div>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
@@ -642,9 +697,6 @@ export default function EMLWebsite() {
         <div style={{display:"flex",gap:28,alignItems:"center"}}>
           {navLinks.map(s=><a key={s} href={`#${s.toLowerCase()}`} className="nav-link">{s}</a>)}
         </div>
-        <button onClick={()=>adminPw?setShowPanel(p=>!p):setShowLogin(true)} style={{padding:"6px 14px",background:"rgba(240,180,41,0.1)",border:"1px solid rgba(240,180,41,0.3)",color:"#f0b429",fontFamily:"Space Mono",fontSize:10,cursor:"pointer",letterSpacing:"0.08em",borderRadius:2}}>
-          {showPanel?"✕ CLOSE":"⚙ ADMIN"}
-        </button>
       </nav>
 
       {/* HERO */}
@@ -846,12 +898,6 @@ export default function EMLWebsite() {
         </div>
       </footer>
 
-      {/* Floating Admin Button */}
-      <div style={{position:"fixed",bottom:24,right:24,zIndex:8999}}>
-        <button onClick={()=>adminPw?setShowPanel(p=>!p):setShowLogin(true)} style={{padding:"10px 18px",background:showPanel?"#f0b429":"#0a162e",border:"1px solid #f0b429",color:showPanel?"#0a162e":"#f0b429",fontFamily:"Space Mono",fontSize:11,cursor:"pointer",letterSpacing:"0.08em",boxShadow:"0 4px 16px rgba(0,0,0,0.5)",borderRadius:2}}>
-          {showPanel?"✕ Close Panel":"⚙ Admin Panel"}
-        </button>
-      </div>
     </div>
   );
 }
