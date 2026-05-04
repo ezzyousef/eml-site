@@ -797,12 +797,11 @@ async function fetchPapers() {
 
 // ── PUBLICATIONS SECTION ───────────────────────────────────────────────────
 function PublicationsSection() {
-  const { editOn } = useContext(EditContext);
+  const { editOn, extraPapers, setExtraPapers } = useContext(EditContext);
   const [papers, setPapers] = useState(papers2026);
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [extraPapers, setExtraPapers] = useState([]);
   const [addPubOpen, setAddPubOpen] = useState(false);
   const [pubForm, setPubForm] = useState({ title: "", authors: "", venue: "", year: new Date().getFullYear().toString(), doi: "" });
 
@@ -1074,7 +1073,7 @@ function PatentsSection({ editOn, initialPatents }) {
 
 
 // ── EDIT CONTEXT — shared state across all components ─────────────────────
-const EditContext = React.createContext({ editOn: false, openCropForMember: null, setMemberOverrides: null });
+const EditContext = React.createContext({ editOn: false, openCropForMember: null, setMemberOverrides: null, extraPapers: [], setExtraPapers: null, textEdits: {}, setTextEdits: null });
 
 const ADMIN_HASH = "da25c5b5903cfd4b93885fe8a67aed43e871cc8b5cad8eb95988e49cb16da8d9";
 
@@ -1294,7 +1293,7 @@ function ImageCropTool({ src, name, onSave, onClose, onUploadNew }) {
 }
 
 // ── FULL ADMIN PANEL ───────────────────────────────────────────────────────
-function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOverrides, setMemberOverrides, extraMembers, blobPatents }) {
+function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOverrides, setMemberOverrides, extraMembers, blobPatents, extraPapers, textEdits, setTextEdits }) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [pw, setPw] = useState("");
@@ -1320,13 +1319,17 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
         patents: blobPatents,
         extraProjects,
         extraMembers,
+        extraPapers,
+        textEdits,
       };
       const res = await fetch("/api/save-overrides", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
       });
-      const json = await res.json();
+      const text = await res.text();
+      let json = {};
+      try { json = text ? JSON.parse(text) : {}; } catch { json = { error: "Invalid server response" }; }
       if (res.ok && json.ok) {
         setSaveMsg("✓ Saved! Changes are live instantly.");
       } else {
@@ -1353,9 +1356,15 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
   }, [loggedIn]);
 
   const enableEdit = () => {
-    document.querySelectorAll("p, h1, h2, h3, h4, span, li").forEach(el => {
+    document.querySelectorAll("p, h1, h2, h3, h4, span, li").forEach((el, idx) => {
       if (!el.closest("input,button,.admin-panel,script,[data-no-edit]")) {
         el.contentEditable = "true"; el.spellcheck = false;
+        // Assign a stable data-edit-id if not already set
+        if (!el.dataset.editId) el.dataset.editId = `edit-${idx}`;
+        el.addEventListener("input", () => {
+          const id = el.dataset.editId;
+          setTextEdits(prev => ({ ...prev, [id]: el.textContent }));
+        }, { once: false });
       }
     });
     setEditOn(true);
@@ -1694,6 +1703,8 @@ export default function EMLWebsite() {
   const [editOn, setEditOn] = useState(false);
   const [extraMembers, setExtraMembers] = useState({});
   const [extraProjects, setExtraProjects] = useState([]);
+  const [extraPapers, setExtraPapers] = useState([]);
+  const [textEdits, setTextEdits] = useState({});
   const [memberOverrides, setMemberOverrides] = useState({}); // { memberName: dataUrl }
   const [blobPatents, setBlobPatents] = useState(null); // loaded from Netlify Blobs
   const [inlineCrop, setInlineCrop] = useState(null); // { src, name, onSave }
@@ -1702,7 +1713,12 @@ export default function EMLWebsite() {
   // Load saved overrides from Netlify Blobs via API
   useEffect(() => {
     fetch("/api/save-overrides")
-      .then(r => r.ok ? r.json() : null)
+      .then(r => {
+        if (!r.ok) return null;
+        return r.text().then(t => {
+          try { return t ? JSON.parse(t) : null; } catch { return null; }
+        });
+      })
       .then(data => {
         if (!data) return;
         // Restore photo overrides
@@ -1717,9 +1733,40 @@ export default function EMLWebsite() {
         // Restore extra members
         if (data.extraMembers)
           setExtraMembers(data.extraMembers);
+        // Restore extra papers
+        if (data.extraPapers && Array.isArray(data.extraPapers))
+          setExtraPapers(data.extraPapers);
+        // Restore text edits and apply to DOM
+        if (data.textEdits && typeof data.textEdits === "object") {
+          setTextEdits(data.textEdits);
+          // Apply text edits to DOM after render
+          setTimeout(() => {
+            Object.entries(data.textEdits).forEach(([selector, text]) => {
+              try {
+                const el = document.querySelector(selector);
+                if (el) el.textContent = text;
+              } catch {}
+            });
+          }, 500);
+        }
       })
       .catch(() => {});
   }, []);
+
+  // Re-apply text edits to DOM whenever textEdits state changes (e.g. after load)
+  useEffect(() => {
+    if (!textEdits || Object.keys(textEdits).length === 0) return;
+    const apply = () => {
+      Object.entries(textEdits).forEach(([id, text]) => {
+        const el = document.querySelector(`[data-edit-id="${id}"]`);
+        if (el && el.textContent !== text) el.textContent = text;
+      });
+    };
+    // Try immediately, then again after a short delay for dynamic content
+    apply();
+    const t = setTimeout(apply, 800);
+    return () => clearTimeout(t);
+  }, [textEdits]);
 
   const openCropForMember = (name, currentSrc, onSave) => {
     setInlineCrop({ src: currentSrc, name, onSave });
@@ -1734,7 +1781,7 @@ export default function EMLWebsite() {
 
 
   return (
-    <EditContext.Provider value={{ editOn, openCropForMember, setMemberOverrides }}>
+    <EditContext.Provider value={{ editOn, openCropForMember, setMemberOverrides, extraPapers, setExtraPapers, textEdits, setTextEdits }}>
     <div style={{ fontFamily: "'Outfit', sans-serif", background: "#f4f6fa" }}>
       <style>{CSS}</style>
 
@@ -2172,7 +2219,7 @@ export default function EMLWebsite() {
           onUploadNew={src => setInlineCrop(prev => ({ ...prev, src }))}
         />
       )}
-      <EditToolbar onEditChange={setEditOn} extraProjects={extraProjects} setExtraProjects={setExtraProjects} memberOverrides={memberOverrides} setMemberOverrides={setMemberOverrides} extraMembers={extraMembers} blobPatents={blobPatents} />
+      <EditToolbar onEditChange={setEditOn} extraProjects={extraProjects} setExtraProjects={setExtraProjects} memberOverrides={memberOverrides} setMemberOverrides={setMemberOverrides} extraMembers={extraMembers} blobPatents={blobPatents} extraPapers={extraPapers} textEdits={textEdits} setTextEdits={setTextEdits} />
     </div>
     </EditContext.Provider>
   );
