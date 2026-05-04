@@ -1618,10 +1618,10 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
             <div style={{ padding: "0 18px 18px" }}>
               {/* Netlify Connected Status */}
               <div style={{ background: "rgba(26,158,117,0.08)", border: "1px solid rgba(26,158,117,0.3)", padding: "12px 14px", borderRadius: 2, marginBottom: 16 }}>
-                <p style={{ fontSize: 10, color: "#1a9e75", fontFamily: "Space Mono", fontWeight: 700, marginBottom: 4 }}>✓ NETLIFY BLOBS CONNECTED</p>
+                <p style={{ fontSize: 10, color: "#1a9e75", fontFamily: "Space Mono", fontWeight: 700, marginBottom: 4 }}>✓ VERCEL STORAGE CONNECTED</p>
                 <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
                   Changes save instantly — no rebuild needed.<br/>
-                  Site: <span style={{ color: "#f0b429" }}>eml-group.netlify.app</span>
+                  Site: <span style={{ color: "#f0b429" }}>eml-site.vercel.app</span>
                 </p>
               </div>
 
@@ -1647,7 +1647,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
               {/* Save button */}
               <button onClick={() => { const p = adminPw; saveToNetlify(p); }} disabled={saving}
                 style={{ width: "100%", padding: "14px", background: saving ? "#333" : "#1e4080", color: "white", border: "none", fontFamily: "Space Mono", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", cursor: saving ? "not-allowed" : "pointer", borderRadius: 2, textTransform: "uppercase", marginBottom: 10 }}>
-                {saving ? "⏳ Saving…" : "💾 SAVE & PUBLISH TO NETLIFY"}
+                {saving ? "⏳ Saving…" : "💾 SAVE & PUBLISH"}
               </button>
 
               {saveMsg && (
@@ -1657,7 +1657,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
               )}
 
               <p style={{ fontSize: 9, color: "#555", fontFamily: "Space Mono", marginTop: 12, lineHeight: 1.6 }}>
-                Saves to GitHub → Netlify rebuilds → live in ~30 seconds.
+                Saves instantly — no rebuild needed.
               </p>
             </div>
           )}
