@@ -1,15 +1,8 @@
-// Netlify Function: admin-save
+// Regular Netlify Function (CommonJS) - process.env works here
 // Reads App.jsx from GitHub, patches it, commits back
-// This runs SERVER-SIDE so the GitHub token stays secret
 
 const GH_REPO  = "ezzyousef/eml-site";
-const GH_TOKEN = ""; // Will be set as Netlify env variable
 const ADMIN_HASH = "da25c5b5903cfd4b93885fe8a67aed43e871cc8b5cad8eb95988e49cb16da8d9";
-
-async function sha256(str) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
-}
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -18,42 +11,66 @@ const cors = {
   "Content-Type": "application/json",
 };
 
+async function sha256(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 async function getFile(path, token) {
   const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }
   });
+  if (!res.ok) throw new Error(`GitHub GET failed: ${res.status}`);
   const data = await res.json();
-  return { content: atob(data.content.replace(/\n/g,"")), sha: data.sha };
+  const content = Buffer.from(data.content, "base64").toString("utf8");
+  return { content, sha: data.sha };
 }
 
 async function putFile(path, content, sha, message, token) {
-  const encoded = btoa(unescape(encodeURIComponent(content)));
+  const encoded = Buffer.from(content, "utf8").toString("base64");
   const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${path}`, {
     method: "PUT",
     headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
     body: JSON.stringify({ message, content: encoded, sha })
   });
-  return res.ok;
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`GitHub PUT failed: ${res.status} ${err}`);
+  }
+  return true;
 }
 
-export default async (req, context) => {
-  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
-  if (req.method !== "POST") return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: cors });
+exports.handler = async (event) => {
+  // Handle CORS preflight
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 204, headers: cors, body: "" };
+  }
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers: cors, body: JSON.stringify({ error: "Method not allowed" }) };
+  }
 
   try {
-    const body = await req.json();
+    const body = JSON.parse(event.body || "{}");
     const { password, action, data } = body;
 
     // Verify password
     const hash = await sha256(password || "");
     if (hash !== ADMIN_HASH) {
-      return new Response(JSON.stringify({ error: "Wrong password" }), { status: 401, headers: cors });
+      return { statusCode: 401, headers: cors, body: JSON.stringify({ error: "Wrong password" }) };
+    }
+
+    // Handle check_token without needing GH_TOKEN
+    if (action === "check_token") {
+      const ghToken = process.env.GH_TOKEN || "";
+      return { statusCode: 200, headers: cors, body: JSON.stringify({ ok: true, tokenOk: !!ghToken }) };
     }
 
     // Get GitHub token from environment
     const ghToken = process.env.GH_TOKEN || "";
     if (!ghToken) {
-      return new Response(JSON.stringify({ error: "Server not configured — set GH_TOKEN in Netlify environment variables" }), { status: 500, headers: cors });
+      return { statusCode: 500, headers: cors, body: JSON.stringify({ error: "Server not configured — set GH_TOKEN in Netlify environment variables" }) };
     }
 
     // Read current App.jsx
@@ -67,7 +84,7 @@ export default async (req, context) => {
       const { number, title, inventors, assignee, filed, status, url } = data;
       const newPatent = `  { number: "${number}", title: "${title}", inventors: "${inventors}", assignee: "${assignee || "The American University in Cairo"}", filed: "${filed}", status: "${status}", url: "${url || ""}" },\n`;
       const marker = "const DEFAULT_PATENTS = [\n";
-      if (!appContent.includes(marker)) throw new Error("Patent marker not found");
+      if (!appContent.includes(marker)) throw new Error("Patent marker not found in App.jsx");
       newContent = appContent.replace(marker, marker + newPatent);
       commitMsg = `Add patent: ${title.slice(0, 50)}`;
     }
@@ -78,7 +95,7 @@ export default async (req, context) => {
       const authorsArr = authors.split(",").map(a => `{ name: "${a.trim()}" }`).join(", ");
       const newPaper = `  { year: ${year}, citationCount: 0, title: "${title}", authors: [${authorsArr}], venue: "${venue}", externalIds: ${doi ? `{ DOI: "${doi}" }` : "{}"} },\n`;
       const marker = "const papers2026 = [\n";
-      if (!appContent.includes(marker)) throw new Error("Papers marker not found");
+      if (!appContent.includes(marker)) throw new Error("Papers marker not found in App.jsx");
       newContent = appContent.replace(marker, marker + newPaper);
       commitMsg = `Add paper: ${title.slice(0, 50)}`;
     }
@@ -93,7 +110,6 @@ export default async (req, context) => {
       const photoStr = data.photo ? `, photo: "${data.photo}"` : "";
       const newMember = `      { ...mk("${name}", "${role}", [${interestsArr}], 17)${photoStr}, email: "${email}", scholar: "${scholar || ""}", note: "${note}", bg: "${bg}", color: "${color}", initials: "${initials}" },\n`;
       
-      // Find the right group
       const groupMarker = `label: "${group}",\n    members: [\n`;
       if (!appContent.includes(groupMarker)) throw new Error(`Group "${group}" not found`);
       newContent = appContent.replace(groupMarker, groupMarker + newMember);
@@ -103,29 +119,21 @@ export default async (req, context) => {
     // ── EDIT TEXT ─────────────────────────────────────────────────────────
     else if (action === "edit_text") {
       const { oldText, newText } = data;
-      if (!appContent.includes(oldText)) throw new Error("Text not found in App.jsx");
-      newContent = appContent.replace(oldText, newText);
+      if (!appContent.includes(oldText)) throw new Error(`Text not found in App.jsx: "${oldText.slice(0,50)}"`);
+      newContent = appContent.replaceAll(oldText, newText);
       commitMsg = `Edit text: ${oldText.slice(0, 40)}…`;
     }
 
-    // ── CHECK TOKEN ───────────────────────────────────────────────────────
-    else if (action === "check_token") {
-      return new Response(JSON.stringify({ ok: true, tokenOk: !!ghToken }), { status: 200, headers: cors });
-    }
-
     else {
-      return new Response(JSON.stringify({ error: "Unknown action" }), { status: 400, headers: cors });
+      return { statusCode: 400, headers: cors, body: JSON.stringify({ error: "Unknown action" }) };
     }
 
     // Commit to GitHub
-    const ok = await putFile("src/App.jsx", newContent, sha, commitMsg, ghToken);
-    if (!ok) throw new Error("GitHub commit failed");
+    await putFile("src/App.jsx", newContent, sha, commitMsg, ghToken);
 
-    return new Response(JSON.stringify({ ok: true, message: `Done! Netlify will rebuild in ~30 seconds.` }), { status: 200, headers: cors });
+    return { statusCode: 200, headers: cors, body: JSON.stringify({ ok: true, message: "Done! Netlify will rebuild in ~30 seconds." }) };
 
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: cors });
+    return { statusCode: 500, headers: cors, body: JSON.stringify({ error: e.message }) };
   }
 };
-
-export const config = { path: "/api/admin" };

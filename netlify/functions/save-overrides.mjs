@@ -20,8 +20,6 @@ const cors = {
 export default async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
 
-  // Use Netlify Blobs REST API
-  // Docs: https://docs.netlify.com/blobs/overview/
   const url = `https://api.netlify.com/api/v1/blobs/${SITE_ID}/${STORE_NAME}/${BLOB_KEY}`;
 
   if (req.method === "GET") {
@@ -29,8 +27,12 @@ export default async (req) => {
       const r = await fetch(url, {
         headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` }
       });
-      const text = await r.text();
-      return new Response(r.ok ? text : "{}", { status: 200, headers: cors });
+      if (r.ok) {
+        const text = await r.text();
+        // Return the data, let the client parse it
+        return new Response(text || "{}", { status: 200, headers: cors });
+      }
+      return new Response("{}", { status: 200, headers: cors });
     } catch {
       return new Response("{}", { status: 200, headers: cors });
     }
@@ -41,20 +43,27 @@ export default async (req) => {
       const body = await req.json();
       const { token, ...data } = body;
 
-      // Verify admin password
       const hash = await sha256(token || "");
       if (hash !== ADMIN_HASH) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: cors });
       }
 
-      // Write to Netlify Blobs
+      // Merge with existing data to avoid losing things
+      let existing = {};
+      try {
+        const r = await fetch(url, { headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` } });
+        if (r.ok) existing = JSON.parse(await r.text()) || {};
+      } catch {}
+
+      const merged = { ...existing, ...data, savedAt: new Date().toISOString() };
+
       const r = await fetch(url, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${NETLIFY_TOKEN}`,
           "Content-Type": "application/octet-stream",
         },
-        body: JSON.stringify({ ...data, savedAt: new Date().toISOString() }),
+        body: JSON.stringify(merged),
       });
 
       if (r.ok) {

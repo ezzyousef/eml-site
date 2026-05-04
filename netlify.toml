@@ -5,3 +5,8 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/admin"
+  to = "/.netlify/functions/admin-save"
+  status = 200

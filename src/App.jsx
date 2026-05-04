@@ -959,19 +959,13 @@ function PublicationsSection() {
 }
 
 // ── PATENTS SECTION ────────────────────────────────────────────────────────
-function PatentsSection({ editOn }) {
-  const [patents, setPatents] = useState(() => {
-    try {
-      const stored = localStorage.getItem("eml_patents");
-      return stored ? JSON.parse(stored) : DEFAULT_PATENTS;
-    } catch { return DEFAULT_PATENTS; }
-  });
+function PatentsSection({ editOn, initialPatents }) {
+  const [patents, setPatents] = useState(initialPatents || DEFAULT_PATENTS);
   const [addOpen, setAddOpen] = useState(false);
   const [form, setForm] = useState({ number: "", title: "", inventors: "", assignee: "The American University in Cairo", filed: new Date().getFullYear().toString(), status: "Provisional", url: "" });
 
   const savePatents = (list) => {
     setPatents(list);
-    try { localStorage.setItem("eml_patents", JSON.stringify(list)); } catch {}
   };
 
   const addPatent = () => {
@@ -1323,7 +1317,7 @@ function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOver
       const patch = {
         token: pwArg,
         memberOverrides,
-        patents: (() => { try { return JSON.parse(localStorage.getItem("eml_patents") || "null"); } catch { return null; } })(),
+        patents: blobPatents,
         extraProjects,
         extraMembers,
       };
@@ -1701,6 +1695,7 @@ export default function EMLWebsite() {
   const [extraMembers, setExtraMembers] = useState({});
   const [extraProjects, setExtraProjects] = useState([]);
   const [memberOverrides, setMemberOverrides] = useState({}); // { memberName: dataUrl }
+  const [blobPatents, setBlobPatents] = useState(null); // loaded from Netlify Blobs
   const [inlineCrop, setInlineCrop] = useState(null); // { src, name, onSave }
   useIntersect();
 
@@ -1713,9 +1708,9 @@ export default function EMLWebsite() {
         // Restore photo overrides
         if (data.memberOverrides && Object.keys(data.memberOverrides).length)
           setMemberOverrides(prev => ({ ...prev, ...data.memberOverrides }));
-        // Restore patents to localStorage so PatentsSection picks them up
-        if (data.patents)
-          try { localStorage.setItem("eml_patents", JSON.stringify(data.patents)); } catch {}
+        // Restore patents from Blobs
+        if (data.patents && Array.isArray(data.patents))
+          setBlobPatents(data.patents);
         // Restore extra projects
         if (data.extraProjects && data.extraProjects.length)
           setExtraProjects(data.extraProjects);
@@ -1953,7 +1948,7 @@ export default function EMLWebsite() {
 
 
       {/* PATENTS */}
-      <PatentsSection editOn={editOn} />
+      <PatentsSection editOn={editOn} initialPatents={blobPatents} />
 
 
       {/* TEAM */}
