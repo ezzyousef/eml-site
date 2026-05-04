@@ -1294,7 +1294,7 @@ function ImageCropTool({ src, name, onSave, onClose, onUploadNew }) {
 }
 
 // ── FULL ADMIN PANEL ───────────────────────────────────────────────────────
-function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOverrides, setMemberOverrides, extraMembers }) {
+function EditToolbar({ onEditChange, extraProjects, setExtraProjects, memberOverrides, setMemberOverrides, extraMembers, blobPatents }) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [pw, setPw] = useState("");
@@ -2172,7 +2172,7 @@ export default function EMLWebsite() {
           onUploadNew={src => setInlineCrop(prev => ({ ...prev, src }))}
         />
       )}
-      <EditToolbar onEditChange={setEditOn} extraProjects={extraProjects} setExtraProjects={setExtraProjects} memberOverrides={memberOverrides} setMemberOverrides={setMemberOverrides} extraMembers={extraMembers} />
+      <EditToolbar onEditChange={setEditOn} extraProjects={extraProjects} setExtraProjects={setExtraProjects} memberOverrides={memberOverrides} setMemberOverrides={setMemberOverrides} extraMembers={extraMembers} blobPatents={blobPatents} />
     </div>
     </EditContext.Provider>
   );
